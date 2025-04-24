@@ -26,6 +26,18 @@ def get_wikipedia_summary(mission_name):
         return page.summary
     else:
         print(f"Not found: {mission_name}")
+    
+    """
+    else:
+        # Attempt to find a close match using the search function
+        search_results = wiki_wiki.search(mission_name, results=1)
+        if search_results:
+            best_match = search_results[0]
+            page = wiki_wiki.page(best_match)
+            if page.exists():
+                return page.summary
+        return 'Summary not available.'
+    """
 
     
 def robust_wiki_search(mission_detail):
