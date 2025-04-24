@@ -10,10 +10,19 @@ def barchart_fig(csv_data, year):
     fig = px.bar(
         country_counts, 
         x='Count',
-        y='Country', 
-        title='Number of Missions per Country',
-        labels={'Count': 'Number of Missions', 'Country': 'Country'}
+        y='Country',
+        labels={'Count': 'Number of Missions'},
+        text='Country'  # <-- Add this to show country names inside the bars
     )
 
-    fig.update_layout(yaxis={'categoryorder': 'total ascending'})
+    fig.update_layout(
+        yaxis=dict(
+            categoryorder='total ascending',
+            showticklabels=False,
+            title='',
+            showgrid=False,
+            zeroline=False
+        ),
+        margin=dict(l=0),  # Reduce left margin (l=left)
+    )
     return fig

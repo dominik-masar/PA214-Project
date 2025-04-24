@@ -22,8 +22,8 @@ app = dash.Dash(__name__)
 
 # Layout with 80:20 ratio
 app.layout = html.Div([
-    html.Div([dcc.Graph(figure=main_fig)], style={'width': '80%', 'display': 'inline-block'}),
-    html.Div([dcc.Graph(figure=bar_fig)], style={'width': '20%', 'display': 'inline-block'})
+    html.Div([dcc.Graph(figure=main_fig)], style={'width': '70%', 'display': 'inline-block'}),
+    html.Div([dcc.Graph(figure=bar_fig)], style={'width': '30%', 'display': 'inline-block'})
 ])
 
 if __name__ == '__main__':
