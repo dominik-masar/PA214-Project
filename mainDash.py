@@ -11,7 +11,7 @@ DATASET_FILENAME = "datasets/space_with_geo_with_countries.csv"
 df = pd.read_csv(DATASET_FILENAME)
 
 # Create figures
-main_fig = map_fig()
+main_fig = map_fig(df)
 bar_fig = barchart_fig(df, 2000)  # TODO: insert variable year
 timeline_fig = get_bottom_fig()  # Default: astronauts from U.S.
 
