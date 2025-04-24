@@ -5,14 +5,16 @@ import pandas as pd
 from visualisation.barchartFigure import barchart_fig
 from visualisation.mapGeo import map_fig
 
+DATASET_FILENAME = "datasets/space_with_geo_with_countries.csv"
+
 # Load data
-df = pd.read_csv("datasets/space_with_geo-firstAttempt.csv")
+df = pd.read_csv(DATASET_FILENAME)
 
 # Create figures
 main_fig = map_fig()
-bar_fig = barchart_fig(df)
+bar_fig = barchart_fig(df, 2000) # TODO: insert variable year
 
-main_fig.update_layout(height=700)  # Adjust height to your liking
+main_fig.update_layout(height=700)
 bar_fig.update_layout(height=700)
 
 # Initialize Dash app

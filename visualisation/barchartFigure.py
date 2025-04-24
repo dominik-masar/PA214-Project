@@ -1,16 +1,18 @@
 import pandas as pd
 import plotly.express as px
 
-def barchart_fig(csv_data):
-    company_counts = csv_data['Company Name'].value_counts().reset_index()
-    company_counts.columns = ['Company Name', 'Count']
+def barchart_fig(csv_data, year):
+    filtered_data = csv_data[csv_data['Year'] == year]
+
+    country_counts = filtered_data['Country'].value_counts().reset_index()
+    country_counts.columns = ['Country', 'Count']
 
     fig = px.bar(
-        company_counts, 
+        country_counts, 
         x='Count',
-        y='Company Name', 
-        title='Number of Missions per Company',
-        labels={'Count': 'Number of Missions', 'Company Name': 'Company'}
+        y='Country', 
+        title='Number of Missions per Country',
+        labels={'Count': 'Number of Missions', 'Country': 'Country'}
     )
 
     fig.update_layout(yaxis={'categoryorder': 'total ascending'})
