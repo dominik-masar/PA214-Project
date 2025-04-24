@@ -1,11 +1,12 @@
+
 import dash
 from dash import dcc, html
-from dash.dependencies import Output, Input
+from dash.dependencies import Output, Input, State
 import pandas as pd
 import math
 
 # Load and preprocess the CSV
-df = pd.read_csv("space_missions_with_goals.csv")
+df = pd.read_csv("Space_Corrected.csv")
 df['Datum'] = pd.to_datetime(df['Datum'], errors='coerce')
 df = df.dropna(subset=['Datum'])
 df['Year'] = df['Datum'].dt.year
@@ -47,7 +48,7 @@ app.layout = html.Div([
         'color': 'darkblue'
     }),
 
-    dcc.Store(id="selected-year", data=1970),
+    dcc.Store(id="selected-year", data=1957),
 
     html.Div(style={'display': 'flex', 'flexDirection': 'row', 'alignItems': 'flexStart'}, children=[
 
@@ -84,7 +85,7 @@ app.layout = html.Div([
                     max=max(years),
                     step=1,
                     marks={year: str(year) for year in years if year % 5 == 0},  # Label only every 5th year
-                    value=1970,
+                    value=1957,
                     tooltip={"placement": "bottom", "always_visible": True},
                 ),
                 style={
@@ -95,6 +96,7 @@ app.layout = html.Div([
                     'zIndex': '999'
                 }
             ),
+            dcc.Interval(id="year-interval", interval=1000, n_intervals=0),
         ])
     ]),
 
@@ -211,6 +213,15 @@ def display_missions_count(year):
     index = years.index(year)
     missions = missions_per_year[index]
     return f"Missions in {year}: {missions}"
+
+@app.callback(
+    Output('timeline-slider', 'value'),
+    Input("year-interval", 'n_intervals'),
+    State('selected-year', 'data')
+)
+def increment_slider(n_intervals, current_year):
+    return current_year + 1
+
 
 if __name__ == "__main__":
     app.run(debug=True)
