@@ -42,7 +42,7 @@ milestones = [
     {"year": 2004, "label": "First Private Spacecraft Launch (SpaceShipOne)"},
     {"year": 2012, "label": "First Private Company to Dock with ISS (SpaceX Dragon)"},
     {"year": 2019, "label": "First Image of a Black Hole (Event Horizon Telescope)"},
-    {"year": 2020, "label": "First Crew Launch from U.S. Soil in 9 Years (SpaceX Crew Dragon)"},
+    {"year": 2020, "label": "First Crew Launch from USA Soil in 9 Years (SpaceX Crew Dragon)"},
 ]  # TODO: Check correctness and add more milestones
 
 app.layout = html.Div([
@@ -58,7 +58,7 @@ app.layout = html.Div([
     dcc.Dropdown(
         id='country-dropdown',
         options=[{'label': c, 'value': c} for c in sorted(available_countries)],
-        value='U.S.',
+        value='USA',
         clearable=False
     ),
     dcc.Graph(id='scatter-plot')
