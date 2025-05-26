@@ -82,8 +82,3 @@ with open("current_progress.txt") as input:
 
 df['Mission Goal'] = result
 df.to_csv(output_file, index=False)
-
-
-
-    
-
