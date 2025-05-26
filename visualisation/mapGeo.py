@@ -1,27 +1,44 @@
-import dash
-from dash import dcc, html, callback_context
 from dash.dependencies import Output, Input, State
-import pandas as pd
 import plotly.express as px
 
-def map_fig(csv_data):
+def map_fig(csv_data, precision=2, min_size=1.5, max_size=8):
+    csv_data = csv_data.copy()
 
-    # Create scatter plot on a world map
+    # Round lat/lon to cluster points
+    csv_data['lat_round'] = csv_data['Latitude'].round(precision)
+    csv_data['lon_round'] = csv_data['Longitude'].round(precision)
+
+    # Aggregate by rounded lat/lon
+    grouped = csv_data.groupby(['lat_round', 'lon_round']).size().reset_index(name='count')
+
+    # Normalize counts to marker sizes between min_size and max_size
+    counts = grouped['count']
+    if counts.max() == counts.min():
+        # Avoid division by zero if all counts equal
+        grouped['marker_size'] = min_size
+    else:
+        grouped['marker_size'] = min_size + (counts - counts.min()) / (counts.max() - counts.min()) * (
+                    max_size - min_size)
+
     fig = px.scatter_geo(
-        csv_data,
-        lat="Latitude",
-        lon="Longitude",
-        hover_name="Latitude",
-        projection="natural earth",  # World map projection
+        grouped,
+        lat='lat_round',
+        lon='lon_round',
+        size='marker_size',  # size now scaled
+        hover_name='count',
+        projection='natural earth',
+        size_max=max_size,
     )
 
-    # Customize map appearance
     fig.update_geos(
         visible=True,
         landcolor="lightgray",
         showcountries=True,
         countrycolor="black",
     )
+
+    # Optional: if you want to control marker sizing better, disable default sizemode
+    fig.update_traces(marker=dict(sizemode='diameter'))
 
     return fig
 
