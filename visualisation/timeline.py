@@ -172,7 +172,7 @@ def register_timeline_callbacks(app):
                     segs['Others'] = others_count
 
                 opacity = 0.9 if in_range else 0.3
-                border_color = 'blue' if in_range else 'transparent'
+                border_color = 'white'
 
                 y_offset = container_height
                 for c, ct in segs.items():
@@ -208,46 +208,6 @@ def register_timeline_callbacks(app):
                     },
                     title=f"Year: {year} - Missions: {missions_per_year[i]}",
                 ))
-
-            point_color = 'red' if in_range else '#aaa'
-            points_and_lines.append(html.Div(
-                id=f"point-{year}",
-                style={
-                    'position': 'absolute',
-                    'top': f'{top_px - 3}px',
-                    'left': f'{left_px + point_width_px / 2 - 3}px',
-                    'width': '6px',
-                    'height': '6px',
-                    'backgroundColor': point_color,
-                    'borderRadius': '50%',
-                    'cursor': 'pointer',
-                    'zIndex': 10
-                },
-                title=f"Year: {year} - Missions: {missions_per_year[i]}",
-            ))
-
-        selected_points = [(x, y) for (x, y), year in zip(red_points_positions, years) if start_year <= year <= end_year]
-        for i in range(len(selected_points) - 1):
-            x1, y1 = selected_points[i]
-            x2, y2 = selected_points[i + 1]
-
-            distance = calculate_distance(x1, y1, x2, y2)
-            angle = math.degrees(calculate_angle(x1, y1, x2, y2))
-
-            points_and_lines.append(html.Div(
-                style={
-                    'position': 'absolute',
-                    'top': f'{y1}px',
-                    'left': f'{x1 + point_width_px / 2}px',
-                    'width': f'{distance}px',
-                    'height': '2px',
-                    'backgroundColor': 'green',
-                    'transform': f'rotate({angle}deg)',
-                    'transformOrigin': '0 0',
-                    'zIndex': 5
-                }
-            ))
-
         return points_and_lines
 
     @app.callback(
