@@ -4,7 +4,7 @@ from dash.dependencies import Output, Input, State
 import pandas as pd
 import plotly.express as px
 
-def barchart_fig(data):
+def barchart_fig(data, color_palette):
 
     country_counts = data['Country'].value_counts().reset_index()
     country_counts.columns = ['Country', 'Count']
@@ -13,6 +13,8 @@ def barchart_fig(data):
         country_counts, 
         x='Count',
         y='Country',
+        color='Country',
+        color_discrete_map=color_palette,
         labels={'Count': 'Number of Missions'},
         text='Country'  # <-- Add this to show country names inside the bars
     )

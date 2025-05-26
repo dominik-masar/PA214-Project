@@ -1,10 +1,13 @@
 import dash
 from dash import html, dcc
 from dash.dependencies import Input, Output
+from seaborn import color_palette
+import matplotlib.colors as mcolors
 from visualisation.barchartFigure import barchart_fig, register_barchart_callbacks
 from visualisation.mapGeo import map_fig, register_map_callbacks
 from visualisation.bottomView import get_bottom_fig
 from visualisation.timeline import get_timeline_layout, register_timeline_callbacks
+from preprocessing.color_palette_generator import generate_country_colors
 from preprocessing.loadDatasets import load_datasets, get_country_list
 
 DATASET_MISSIONS_PATH = "datasets/space_with_geo_with_countries.csv"
@@ -19,8 +22,13 @@ available_countries = get_country_list(missions_df, astronauts_df)
 app = dash.Dash(__name__)
 app.missions_df = missions_df
 
+# color palette for countries
+palette = color_palette("hls", 100)
+hex_colors = [mcolors.to_hex(c) for c in palette]
+color_map = generate_country_colors(missions_df, column='Country')
+
 main_fig = map_fig(missions_df)
-bar_fig = barchart_fig(missions_df)
+bar_fig = barchart_fig(missions_df, color_map)
 
 main_fig.update_layout(height=700)
 bar_fig.update_layout(height=700)
