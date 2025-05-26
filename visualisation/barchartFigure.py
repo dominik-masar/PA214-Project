@@ -1,7 +1,4 @@
-import dash
-from dash import dcc, html, callback_context
 from dash.dependencies import Output, Input, State
-import pandas as pd
 import plotly.express as px
 
 def barchart_fig(data, color_palette):
@@ -31,6 +28,7 @@ def barchart_fig(data, color_palette):
     )
     return fig
 
+
 def register_barchart_callbacks(app):
     @app.callback(
         Output('bar-fig', 'figure'),  # or whatever your bar chart graph id is
@@ -40,4 +38,4 @@ def register_barchart_callbacks(app):
         start, end = year_range
         df = app.missions_df
         filtered_df = df[(df['Year'] >= start) & (df['Year'] <= end)]
-        return barchart_fig(filtered_df)
+        return barchart_fig(filtered_df, app.color_map)

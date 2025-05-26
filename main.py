@@ -17,15 +17,16 @@ DATASET_ASTRONAUTS_PATH = "datasets/astronauts.csv"
 missions_df, astronauts_df = load_datasets(mission_path=DATASET_MISSIONS_PATH, astronauts_path=DATASET_ASTRONAUTS_PATH)
 available_countries = get_country_list(missions_df, astronauts_df)
 
-# Save missions_df on app instance for timeline module access
-# (Timeline callbacks will read this via app.missions_df)
-app = dash.Dash(__name__)
-app.missions_df = missions_df
-
 # color palette for countries
 palette = color_palette("hls", 100)
 hex_colors = [mcolors.to_hex(c) for c in palette]
 color_map = generate_country_colors(missions_df, column='Country')
+
+# Save missions_df on app instance for timeline module access
+# (Timeline callbacks will read this via app.missions_df)
+app = dash.Dash(__name__)
+app.missions_df = missions_df
+app.color_map = color_map
 
 main_fig = map_fig(missions_df)
 bar_fig = barchart_fig(missions_df, color_map)
