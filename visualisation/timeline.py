@@ -4,51 +4,14 @@ from dash.dependencies import Output, Input, State
 import pandas as pd
 import math
 from dash.exceptions import PreventUpdate
-
-# Load and preprocess the CSV
-df = pd.read_csv("datasets/Space_Corrected.csv")
-df['Datum'] = pd.to_datetime(df['Datum'], errors='coerce')
-df = df.dropna(subset=['Datum'])
-df['Year'] = df['Datum'].dt.year
-
-def normalize_country(loc):
-    if isinstance(loc, str):
-        if 'USA' in loc or 'Texas' in loc or 'Florida' in loc:
-            return 'USA'
-        return loc.split(',')[-1].strip()
-    return loc
-
-df['Country'] = df['Location'].apply(normalize_country)
-
-missions_by_year = df.groupby('Year').size().reset_index(name='MissionCount')
-min_year = df['Year'].min()
-max_year = df['Year'].max()
-
-all_years = pd.DataFrame({'Year': list(range(min_year, max_year + 1))})
-missions_by_year = all_years.merge(missions_by_year, on='Year', how='left').fillna(0)
-missions_by_year['MissionCount'] = missions_by_year['MissionCount'].astype(int)
-
-years = missions_by_year['Year'].tolist()
-missions_per_year = missions_by_year['MissionCount'].tolist()
-max_count = max(missions_per_year)
-
-COUNTRY_COLORS = {
-    'USA': 'rgba(31, 119, 180, 0.6)',
-    'Russia': 'rgba(255, 127, 14, 0.6)',
-    'China': 'rgba(44, 160, 44, 0.6)',
-    'India': 'rgba(214, 39, 40, 0.6)',
-    'Japan': 'rgba(148, 103, 189, 0.6)',
-    'Europe': 'rgba(140, 86, 75, 0.6)',
-    'Others': 'rgba(128, 128, 128, 0.4)',
-}
-
-def calculate_distance(x1, y1, x2, y2):
-    return math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
-
-def calculate_angle(x1, y1, x2, y2):
-    return math.atan2(y2 - y1, x2 - x1)
+import dash_daq as daq
 
 def get_timeline_layout():
+    df = dash.get_app().missions_df
+    min_year = int(df['Year'].min())
+    max_year = int(df['Year'].max())
+    years = list(range(min_year, max_year + 1))
+
     return html.Div([
         html.Div(id='year-display', style={
             'fontSize': '18px',
@@ -59,8 +22,18 @@ def get_timeline_layout():
         dcc.Store(id="selected-years", data=[min_year, max_year]),
         dcc.Store(id="window-size", data=max_year - min_year + 1),
         dcc.Store(id="start-position", data=min_year),
+        dcc.Store(id="initial-start-position", data=min_year),
         dcc.Store(id="animation-index", data=0),
         dcc.Store(id="is-playing", data=False),
+
+        html.Div([
+            daq.ToggleSwitch(
+                id='timeline-mode-toggle',
+                value=False,  # False = cumulative, True = floating
+                label=['Cumulative Mode', 'Floating Window Mode'],
+                style={'marginBottom': '10px'}
+            )
+        ], style={'marginBottom': '20px', 'display': 'flex', 'alignItems': 'center'}),
 
         html.Div(style={'display': 'flex', 'flexDirection': 'row', 'alignItems': 'flexStart'}, children=[
             html.Div("Mission Count", style={
@@ -83,7 +56,8 @@ def get_timeline_layout():
                     'border': '1px solid #ddd',
                     'backgroundColor': '#fdfdfd',
                     'overflow': 'hidden',
-                    'marginBottom': '10px'
+                    'marginBottom': '10px',
+                    'marginLeft': f'-{1000 / len(years) / 2}px'
                 }),
                 html.Div(
                     dcc.RangeSlider(
@@ -108,77 +82,64 @@ def get_timeline_layout():
         ]),
         html.Button('Play', id='play-button', n_clicks=0, style={'marginBottom': '10px'}),
         dcc.Interval(id='interval-component', interval=1000, n_intervals=0, disabled=True),
-        html.Div(id='missions-count-display', style={'fontSize': '18px', 'fontWeight': 'bold', 'color': 'darkgreen'}),
-        html.Div([
-            html.Span([
-                html.Span(style={
-                    'display': 'inline-block',
-                    'width': '12px',
-                    'height': '12px',
-                    'backgroundColor': col,
-                    'marginRight': '6px',
-                    'opacity': '0.6',
-                    'border': '1px solid #444'
-                }),
-                html.Span(country, style={'marginRight': '12px'})
-            ]) for country, col in COUNTRY_COLORS.items()
-        ], style={'marginTop': '10px', 'display': 'flex', 'flexWrap': 'wrap'}),
     ])
 
-def register_timeline_callbacks(app):
+def _hex_to_rgba(hex_color, alpha):
+    hex_color = hex_color.lstrip('#')
+    lv = len(hex_color)
+    rgb = tuple(int(hex_color[i:i + lv // 3], 16) for i in range(0, lv, lv // 3))
+    return f'rgba({rgb[0]}, {rgb[1]}, {rgb[2]}, {alpha})'
 
-    @app.callback(
-        Output('year-display', 'children'),
-        Input('selected-years', 'data')
-    )
-    def display_selected_range(year_range):
-        return f"Selected Years: {year_range[0]} – {year_range[1]}"
+def register_timeline_callbacks(app):
+    df = app.missions_df
+    color_map = app.color_map
+    min_year = int(df['Year'].min())
+    max_year = int(df['Year'].max())
+    years = list(range(min_year, max_year + 1))
+    missions_by_year = df.groupby('Year').size().reindex(years, fill_value=0)
+    max_count = missions_by_year.max()
 
     @app.callback(
         Output('timeline-container', 'children'),
-        Input('selected-years', 'data')
+        [Input('selected-years', 'data'),
+         Input('timeline-mode-toggle', 'value')]
     )
-    def update_timeline(selected_range):
+    def update_timeline(selected_range, mode_toggle):
+        mode = 'window' if mode_toggle else 'cumulative'
         start_year, end_year = selected_range
         container_width = 1000
         container_height = 100
         point_width_px = container_width / len(years)
 
         points_and_lines = []
-        red_points_positions = []
 
         for i, year in enumerate(years):
-            height_ratio = missions_per_year[i] / max_count if max_count > 0 else 0
+            year_df = df[df['Year'] == year]
+            total_missions = len(year_df)
+            height_ratio = total_missions / max_count if max_count > 0 else 0
             height_px = height_ratio * container_height
             left_px = i * point_width_px
             top_px = container_height - height_px
 
-            red_points_positions.append((left_px, top_px))
+            is_selected = start_year <= year <= end_year
 
-            in_range = start_year <= year <= end_year
+            alpha = 1.0 if is_selected else 0.2
 
-            if missions_per_year[i] > 0:
-                year_df = df[df['Year'] == year]
+            if total_missions > 0:
                 counts = year_df['Country'].value_counts().to_dict()
-
                 sorted_counts = sorted(counts.items(), key=lambda x: x[1], reverse=True)
                 top_countries = sorted_counts[:2]
                 others_count = sum(ct for _, ct in sorted_counts[2:])
-
-                segs = {}
-                for c, ct in top_countries:
-                    segs[c] = ct
+                segs = {c: ct for c, ct in top_countries}
                 if others_count > 0:
                     segs['Others'] = others_count
-
-                opacity = 0.9 if in_range else 0.3
-                border_color = 'white'
 
                 y_offset = container_height
                 for c, ct in segs.items():
                     seg_height = (ct / max_count) * container_height
                     y_offset -= seg_height
-
+                    base_color = color_map.get(c, '#888888')
+                    color = _hex_to_rgba(base_color, alpha)
                     points_and_lines.append(html.Div(
                         style={
                             'position': 'absolute',
@@ -186,8 +147,8 @@ def register_timeline_callbacks(app):
                             'left': f'{left_px}px',
                             'width': f'{point_width_px}px',
                             'height': f'{seg_height}px',
-                            'backgroundColor': COUNTRY_COLORS.get(c, COUNTRY_COLORS['Others']).replace('0.6', str(opacity)),
-                            'borderLeft': f'1px solid {border_color}',
+                            'backgroundColor': color,
+                            'borderLeft': '1px solid white',
                             'boxSizing': 'border-box',
                             'zIndex': 5
                         },
@@ -201,24 +162,14 @@ def register_timeline_callbacks(app):
                         'left': f'{left_px}px',
                         'width': f'{point_width_px}px',
                         'height': f'{height_px}px',
-                        'backgroundColor': 'rgba(128,128,128,0.3)',
+                        'backgroundColor': f'rgba(128,128,128,{alpha})',
                         'borderLeft': '1px solid transparent',
                         'boxSizing': 'border-box',
                         'zIndex': 5
                     },
-                    title=f"Year: {year} - Missions: {missions_per_year[i]}",
+                    title=f"Year: {year} - Missions: 0",
                 ))
         return points_and_lines
-
-    @app.callback(
-        Output('missions-count-display', 'children'),
-        Input('selected-years', 'data')
-    )
-    def display_missions_count(year_range):
-        start_year, end_year = year_range
-        filtered_df = df[(df['Year'] >= start_year) & (df['Year'] <= end_year)]
-        total_missions = filtered_df.shape[0]
-        return f"Missions from {start_year} to {end_year}: {total_missions}"
 
     @app.callback(
         Output('interval-component', 'disabled'),
@@ -235,41 +186,50 @@ def register_timeline_callbacks(app):
             return not new_state, "Pause" if new_state else "Play", new_state
 
     @app.callback(
-    Output('selected-years', 'data'),
-    Output('window-size', 'data'),
-    Output('start-position', 'data'),
-    Output('animation-index', 'data'),
-    Input('timeline-slider', 'value'),
-    Input('interval-component', 'n_intervals'),
-    State('window-size', 'data'),
-    State('start-position', 'data'),
-    State('animation-index', 'data'),
-    State('is-playing', 'data'),
-    prevent_initial_call=True
-)
-    def update_selected_years(slider_range, n_intervals, window_size, start_pos, animation_index, is_playing):
+        Output('selected-years', 'data'),
+        Output('window-size', 'data'),
+        Output('start-position', 'data'),
+        Output('animation-index', 'data'),
+        Output('timeline-slider', 'value'),
+        Input('timeline-slider', 'value'),
+        Input('interval-component', 'n_intervals'),
+        Input('timeline-mode-toggle', 'value'),
+        State('window-size', 'data'),
+        State('start-position', 'data'),
+        State('animation-index', 'data'),
+        State('is-playing', 'data'),
+        State('initial-start-position', 'data'),
+        State('selected-years', 'data'),
+        State('timeline-mode-toggle', 'value'),
+    )
+    def update_selected_years(slider_range, n_intervals, mode_toggle_changed, window_size, start_pos, animation_index, is_playing, initial_start_pos, current_selected_years, mode_toggle):
         ctx = callback_context
 
         if not ctx.triggered:
             raise PreventUpdate
 
         trigger_id = ctx.triggered[0]['prop_id'].split('.')[0]
-
-        if trigger_id == 'timeline-slider':
+        mode = 'window' if mode_toggle else 'cumulative'
+        if trigger_id == 'timeline-slider' or trigger_id == 'timeline-mode-toggle':
             start, end = slider_range
-            new_window_size = end - start + 1
-            new_start_pos = start
-            return [start, end], new_window_size, new_start_pos, 0
+            window_size = end - start + 1
+            return [start, end], window_size, start, 0, slider_range
 
         elif trigger_id == 'interval-component' and is_playing:
-            new_start_pos = start_pos + 1
-            if new_start_pos + window_size - 1 > max_year:
-                new_start_pos = slider_range[0]
-
-            new_end_pos = new_start_pos + window_size - 1
-            new_animation_index = animation_index + 1
-
-            return [new_start_pos, new_end_pos], window_size, new_start_pos, new_animation_index
+            if mode == 'cumulative':
+                start, end = slider_range
+                new_end = start + animation_index
+                if new_end > end:
+                    new_end = slider_range[1]
+                    animation_index = -1
+                return [start, new_end], window_size, start_pos, animation_index + 1, slider_range
+            else:
+                new_start = start_pos + 1
+                new_end = new_start + window_size - 1
+                if new_end > max_year:
+                    new_start = initial_start_pos
+                    new_end = new_start + window_size - 1
+                return [new_start, new_end], window_size, new_start, animation_index + 1, [new_start, new_end]
 
         else:
             raise PreventUpdate
