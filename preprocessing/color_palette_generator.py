@@ -9,7 +9,8 @@ def generate_country_colors(data, column='Country', fallback_palette='hls'):
         'France': '#dbe11e',
         'Russia': '#ff0c00',
         'Pacific Ocean': '#5da0ff',
-        'Japan': '#fea2ff'
+        'Japan': '#fea2ff',
+        'Others': '#888888'
     }
 
     all_countries = data[column].unique().tolist()

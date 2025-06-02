@@ -10,6 +10,7 @@ from visualisation.timeline import get_timeline_layout, register_timeline_callba
 from visualisation.planets import get_planet_layout, register_planet_callbacks
 from preprocessing.color_palette_generator import generate_country_colors
 from preprocessing.loadDatasets import load_datasets, get_country_list
+from utils.min_max_setter import set_max_count_to_app
 
 DATASET_MISSIONS_PATH = "datasets/final_dataset_missions.csv"
 DATASET_ASTRONAUTS_PATH = "datasets/astronauts.csv"
@@ -27,7 +28,8 @@ app = dash.Dash(__name__)
 app.missions_df = missions_df
 app.color_map = color_map
 
-main_fig = map_fig(missions_df)
+set_max_count_to_app(app, missions_df)
+main_fig = map_fig(missions_df, app.max_missions)
 bar_fig = barchart_fig(missions_df, color_map)
 
 main_fig.update_layout(height=700)
@@ -36,7 +38,7 @@ bar_fig.update_layout(height=700)
 app.layout = html.Div([
     html.Div(get_planet_layout(), style={'width': '70%', 'display': 'inline-block'}),
     html.Div([dcc.Graph(id='map-fig', figure=main_fig)], style={'width': '70%', 'display': 'inline-block'}),
-    html.Div([dcc.Graph(id='bar-fig', figure=bar_fig)], style={'width': '30%', 'display': 'inline-block'}),
+    html.Div([dcc.Graph(id='bar-fig', figure=bar_fig, config={'staticPlot': True})], style={'width': '30%', 'display': 'inline-block'}),
 
     html.Div(get_timeline_layout(), style={'width': '100%', 'display': 'inline-block'}),
 

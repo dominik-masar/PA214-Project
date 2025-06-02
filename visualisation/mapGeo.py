@@ -1,33 +1,24 @@
-from dash.dependencies import Output, Input, State
+import numpy as np
+from dash.dependencies import Output, Input
 import plotly.express as px
 
-def map_fig(csv_data, precision=2, min_size=1.5, max_size=8):
+def map_fig(csv_data, max_missions, precision=2, max_size=40):
     csv_data = csv_data.copy()
 
-    # Round lat/lon to cluster points
     csv_data['lat_round'] = csv_data['Latitude'].round(precision)
     csv_data['lon_round'] = csv_data['Longitude'].round(precision)
 
-    # Aggregate by rounded lat/lon
     grouped = csv_data.groupby(['lat_round', 'lon_round']).size().reset_index(name='count')
-
-    # Normalize counts to marker sizes between min_size and max_size
-    counts = grouped['count']
-    if counts.max() == counts.min():
-        # Avoid division by zero if all counts equal
-        grouped['marker_size'] = min_size
-    else:
-        grouped['marker_size'] = min_size + (counts - counts.min()) / (counts.max() - counts.min()) * (
-                    max_size - min_size)
+    grouped['marker_size'] = max_size * np.sqrt(grouped['count'] / max_missions)
 
     fig = px.scatter_geo(
         grouped,
         lat='lat_round',
         lon='lon_round',
-        size='marker_size',  # size now scaled
+        size='marker_size',
         hover_name='count',
         projection='natural earth',
-        size_max=max_size,
+        size_max=grouped['marker_size'].max()
     )
 
     fig.update_geos(
@@ -37,8 +28,10 @@ def map_fig(csv_data, precision=2, min_size=1.5, max_size=8):
         countrycolor="black",
     )
 
-    # Optional: if you want to control marker sizing better, disable default sizemode
-    fig.update_traces(marker=dict(sizemode='diameter'))
+    fig.update_layout(
+        margin=dict(l=0, r=0, t=0, b=0),
+        uirevision=True
+    )
 
     return fig
 
@@ -51,4 +44,4 @@ def register_map_callbacks(app):
         start, end = year_range
         df = app.missions_df
         filtered_df = df[(df['Year'] >= start) & (df['Year'] <= end)]
-        return map_fig(filtered_df)
+        return map_fig(filtered_df, app.max_missions)

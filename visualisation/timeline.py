@@ -1,8 +1,6 @@
 import dash
 from dash import dcc, html, callback_context
 from dash.dependencies import Output, Input, State
-import pandas as pd
-import math
 from dash.exceptions import PreventUpdate
 import dash_daq as daq
 
