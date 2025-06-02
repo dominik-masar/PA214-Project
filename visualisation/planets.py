@@ -55,7 +55,7 @@ def get_planet_layout():
             "gap": "10px",
             "padding": "0",
         })
-    ], style={"margin": "10px", "padding": "10px"})
+    ], style={"margin": "0px", "padding": "0px"})
 
 def register_planet_callbacks(app):
     @app.callback(

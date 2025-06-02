@@ -36,7 +36,7 @@ main_fig.update_layout(height=700)
 bar_fig.update_layout(height=700)
 
 app.layout = html.Div([
-    html.Div(get_planet_layout(), style={'width': '70%', 'display': 'inline-block'}),
+    html.Div(get_planet_layout(), style={'width': '70%', 'height': '120px', 'display': 'inline-block'}),
     html.Div([dcc.Graph(id='map-fig', figure=main_fig)], style={'width': '70%', 'display': 'inline-block'}),
     html.Div([dcc.Graph(id='bar-fig', figure=bar_fig, config={'staticPlot': True})], style={'width': '30%', 'display': 'inline-block'}),
 
