@@ -3,11 +3,12 @@ from dash import html, dcc
 from dash.dependencies import Input, Output
 from seaborn import color_palette
 import matplotlib.colors as mcolors
-from visualisation.barchartFigure import barchart_fig, register_barchart_callbacks
-from visualisation.mapGeo import map_fig, register_map_callbacks
-from visualisation.bottomView import get_bottom_fig
-from visualisation.timeline import get_timeline_layout, register_timeline_callbacks
-from visualisation.planets import get_planet_layout, register_planet_callbacks
+from callbacks.sidebar_callbacks import register_sidebar_callbacks
+from callbacks.map_callbacks import register_map_callbacks
+from visualisation.map_figure import map_fig
+from visualisation.active_years_figure import get_bottom_fig
+from visualisation.timeline_figure import get_timeline_layout, register_timeline_callbacks
+from visualisation.planets_figure import get_planet_layout, register_planet_callbacks
 from preprocessing.color_palette_generator import generate_country_colors
 from preprocessing.loadDatasets import load_datasets, get_country_list
 from utils.min_max_setter import set_max_count_to_app
@@ -29,16 +30,24 @@ app.missions_df = missions_df
 app.color_map = color_map
 
 set_max_count_to_app(app, missions_df)
-main_fig = map_fig(missions_df, app.max_missions)
-bar_fig = barchart_fig(missions_df, color_map)
-
-main_fig.update_layout(height=700)
-bar_fig.update_layout(height=700)
+map_fig = map_fig(missions_df, app.max_missions)
 
 app.layout = html.Div([
     html.Div(get_planet_layout(), style={'width': '70%', 'height': '120px', 'display': 'inline-block'}),
-    html.Div([dcc.Graph(id='map-fig', figure=main_fig)], style={'width': '70%', 'display': 'inline-block'}),
-    html.Div([dcc.Graph(id='bar-fig', figure=bar_fig, config={'staticPlot': True})], style={'width': '30%', 'display': 'inline-block'}),
+    html.Div([
+        dcc.Input(
+            id='search-input',
+            type='text',
+            placeholder='Search...'
+        ),
+        html.Button('Search', id='search-button', n_clicks=0),
+        html.Button('Reset', id='reset-button', n_clicks=0),
+        dcc.Store(id='trigger-update')
+    ], style={'width': '20%', 'display': 'inline-block', 'margin-left': '10px'}),
+    html.Div([
+        html.Div([dcc.Graph(id='map-fig', figure=map_fig)], style={'width': '65%', 'height': '100%', 'display': 'inline-block'}),
+        html.Div(id='sidebar-fig', style={'width': '30%', 'display': 'inline-block'}),
+    ], style={'display': 'flex', 'gap': '5%', 'height': '700px'}),
 
     html.Div(get_timeline_layout(), style={'width': '100%', 'display': 'inline-block'}),
 
@@ -72,7 +81,7 @@ def update_active_years_fig(selected_view, selected_country):
 
 
 register_timeline_callbacks(app)
-register_barchart_callbacks(app)
+register_sidebar_callbacks(app)
 register_map_callbacks(app)
 register_planet_callbacks(app)
 

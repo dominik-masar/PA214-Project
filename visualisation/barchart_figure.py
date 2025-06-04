@@ -1,5 +1,4 @@
 import pandas as pd
-from dash.dependencies import Output, Input, State
 import plotly.express as px
 
 def barchart_fig(data, color_palette, top_n=9):
@@ -34,20 +33,9 @@ def barchart_fig(data, color_palette, top_n=9):
             zeroline=False
         ),
         margin=dict(l=0, r=0, t=0, b=0),
+        height=700,
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
         showlegend=False
     )
     return fig
-
-
-def register_barchart_callbacks(app):
-    @app.callback(
-        Output('bar-fig', 'figure'),  # or whatever your bar chart graph id is
-        Input('selected-years', 'data')
-    )
-    def update_bar_chart(year_range):
-        start, end = year_range
-        df = app.missions_df
-        filtered_df = df[(df['Year'] >= start) & (df['Year'] <= end)]
-        return barchart_fig(filtered_df, app.color_map)

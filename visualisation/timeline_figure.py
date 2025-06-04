@@ -4,6 +4,10 @@ from dash.dependencies import Output, Input, State
 from dash.exceptions import PreventUpdate
 import dash_daq as daq
 
+min_year = 1950
+max_year = 2030
+
+
 def get_timeline_layout():
     df = dash.get_app().missions_df
     min_year = int(df['Year'].min())
@@ -89,20 +93,25 @@ def _hex_to_rgba(hex_color, alpha):
     return f'rgba({rgb[0]}, {rgb[1]}, {rgb[2]}, {alpha})'
 
 def register_timeline_callbacks(app):
-    df = app.missions_df
-    color_map = app.color_map
-    min_year = int(df['Year'].min())
-    max_year = int(df['Year'].max())
-    years = list(range(min_year, max_year + 1))
-    missions_by_year = df.groupby('Year').size().reindex(years, fill_value=0)
-    max_count = missions_by_year.max()
-
     @app.callback(
         Output('timeline-container', 'children'),
         [Input('selected-years', 'data'),
+         Input('trigger-update', 'data'),
          Input('timeline-mode-toggle', 'value')]
     )
-    def update_timeline(selected_range, mode_toggle):
+    def update_timeline(selected_range, trigger_data, mode_toggle):
+        if trigger_data and trigger_data['search_triggered']:
+            df = app.filtered_df
+        else:
+            df = app.missions_df
+
+        color_map = app.color_map
+        min_year = int(df['Year'].min())
+        max_year = int(df['Year'].max())
+        years = list(range(min_year, max_year + 1))
+        missions_by_year = df.groupby('Year').size().reindex(years, fill_value=0)
+        max_count = missions_by_year.max()
+
         mode = 'window' if mode_toggle else 'cumulative'
         start_year, end_year = selected_range
         container_width = 1000

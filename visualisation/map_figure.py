@@ -1,5 +1,5 @@
 import numpy as np
-from dash.dependencies import Output, Input
+from dash.dependencies import Output, Input, State
 import plotly.express as px
 
 def map_fig(csv_data, max_missions, precision=2, max_size=40):
@@ -30,18 +30,8 @@ def map_fig(csv_data, max_missions, precision=2, max_size=40):
 
     fig.update_layout(
         margin=dict(l=0, r=0, t=0, b=0),
-        uirevision=True
+        uirevision=True,
+        height=700
     )
 
     return fig
-
-def register_map_callbacks(app):
-    @app.callback(
-        Output('map-fig', 'figure'),  # or whatever your bar chart graph id is
-        Input('selected-years', 'data')
-    )
-    def update_map(year_range):
-        start, end = year_range
-        df = app.missions_df
-        filtered_df = df[(df['Year'] >= start) & (df['Year'] <= end)]
-        return map_fig(filtered_df, app.max_missions)
