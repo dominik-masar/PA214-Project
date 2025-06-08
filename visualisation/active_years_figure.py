@@ -3,6 +3,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.express.colors import qualitative
 from matplotlib.colors import to_rgba
+from dash import dcc, html, Input, Output
 
 milestones = [
     {"year": 1961, "label": "First Man in Space: Yuri Gagarin"},
@@ -100,7 +101,7 @@ def add_trajectory_lines(fig, filtered_df, group_column, x_column, color_map, na
             hoverinfo='skip'
         ))
 
-def get_bottom_fig(missions_df, astronauts_df, view_type='companies', selected_country='USA'):
+def get_active_years_fig(missions_df, astronauts_df, view_type='companies', selected_country='USA'):
     filtered_df, group_column, x_column, y_column, hover_data_cols, y_label = filter_data(view_type, selected_country, missions_df, astronauts_df)
     unique_names = filtered_df[group_column].unique()
     color_map = assign_colors(unique_names, palette)
@@ -134,3 +135,13 @@ def get_bottom_fig(missions_df, astronauts_df, view_type='companies', selected_c
     )
 
     return fig
+
+
+def register_active_years_callbacks(app):
+    @app.callback(
+        Output('active-years-fig', 'figure'),
+        [Input('bottom-view-toggle', 'value'),
+        Input('country-dropdown', 'value')]
+    )
+    def update_active_years_fig(selected_view, selected_country):
+        return get_active_years_fig(app.missions_df, app.astronauts_df, view_type=selected_view, selected_country=selected_country)
