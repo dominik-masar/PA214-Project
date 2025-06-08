@@ -145,8 +145,8 @@ def get_active_years_fig(missions_df, astronauts_df, view_type='companies', sele
 def register_active_years_callbacks(app):
     @app.callback(
         Output('active-years-fig', 'figure'),
-        [Input('bottom-view-toggle', 'value'),
-        Input('country-dropdown', 'value')]
+        [Input('view-type', 'data'),
+         Input('country-dropdown', 'value')]
     )
     def update_active_years_fig(selected_view, selected_country):
         return get_active_years_fig(app.missions_df, app.astronauts_df, view_type=selected_view, selected_country=selected_country)

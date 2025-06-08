@@ -3,7 +3,8 @@ from dash import html, dcc
 def get_navbar():
     return html.Div([
         dcc.Link("🚀 Space Missions", href="/home", style=link_style),
-        dcc.Link("👩‍🚀 Profiles", href="/profiles", style=link_style),
+        dcc.Link("👩‍🚀 Astronauts", href="/astronauts", style=link_style),
+        dcc.Link("🏢 Companies", href="/companies", style=link_style),
         dcc.Link("📖 Mission Logs", href="/logs", style=link_style),
     ], style={
         'backgroundColor': '#111',

@@ -7,27 +7,19 @@ import dash
 
 
 
-def get_profiles_layout(app, available_countries):
+def get_profiles_layout(app, available_countries, view_type='astronauts'):
     return html.Div([
         get_navbar(),
-        dcc.RadioItems(
-            id='bottom-view-toggle',
-            options=[
-                {'label': 'Astronauts', 'value': 'astronauts'},
-                {'label': 'Companies', 'value': 'companies'}
-            ],
-            value='astronauts',
-            labelStyle={'display': 'inline-block', 'margin-right': '20px'}
-        ),
+        html.H2("Astronauts" if view_type == 'astronauts' else "Companies"),
         dcc.Dropdown(
             id='country-dropdown',
             options=[{'label': c, 'value': c} for c in sorted(available_countries)],
             value='USA',
             clearable=False
         ),
-        dcc.Graph(id='active-years-fig', config={'scrollZoom': True}, style={'height': '600px'})
+        dcc.Graph(id='active-years-fig', config={'scrollZoom': True}, style={'height': '600px'}),
+        dcc.Store(id='view-type', data=view_type)
     ])
-
 
 def register_profiles_callbacks(app, missions_df):
     @app.callback(
@@ -45,20 +37,3 @@ def register_profiles_callbacks(app, missions_df):
             except Exception:
                 pass
         return dash.no_update
-
-    """
-    def go_to_mission_log(clickData):
-        if clickData and 'points' in clickData and clickData['points']:
-            detail = clickData['points'][0]['customdata']
-            # Find the mission's index (row) in missions_df
-            try:
-                idx = missions_df[missions_df['Detail'] == detail].index[0]
-                page_size = 15
-                page = idx // page_size + 1
-                # Use anchor to scroll to the mission card
-                #return f"/logs/{page}#mission-{idx}"
-                return f"/logs/{page}"
-            except Exception:
-                pass
-        return dash.no_update
-    """

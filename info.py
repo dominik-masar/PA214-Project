@@ -6,7 +6,11 @@ import re
 # TODO nechci tohle posila z app?
 missions_df = pd.read_csv("datasets/final_dataset_missions.csv")
 wiki_df = pd.read_csv("datasets/wiki_summaries.csv")
-merged_df = pd.merge(missions_df, wiki_df, on="Detail", how="left")
+merged_df = pd.merge(missions_df, wiki_df, on="Index", how="left")
+
+# Ensure merged_df has the same number of records as missions_df
+merged_df = merged_df.set_index(missions_df.index)
+
 
 def get_info_layout(app, pathname):
     # Extract page number

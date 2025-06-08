@@ -20,6 +20,7 @@ from profiles import register_profiles_callbacks
 
 DATASET_MISSIONS_PATH = "datasets/final_dataset_missions.csv"
 DATASET_ASTRONAUTS_PATH = "datasets/astronauts.csv"
+DATASET_WIKI_PATH = "datasets/wiki_summaries.csv"
 
 # Load datasets
 missions_df, astronauts_df = load_datasets(mission_path=DATASET_MISSIONS_PATH, astronauts_path=DATASET_ASTRONAUTS_PATH)
@@ -55,8 +56,10 @@ app.layout = html.Div([
 def display_page(pathname):
     if pathname == '/' or pathname == '/home':
         return get_home_layout(app)
-    elif pathname.startswith('/profiles'):
-        return get_profiles_layout(app, available_countries)
+    elif pathname == '/astronauts':
+        return get_profiles_layout(app, available_countries, view_type='astronauts')
+    elif pathname == '/companies':
+        return get_profiles_layout(app, available_countries, view_type='companies')
     elif pathname.startswith('/logs'):
         return get_info_layout(app, pathname)
     elif pathname.startswith('/mission'):
