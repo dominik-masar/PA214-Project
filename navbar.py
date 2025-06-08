@@ -4,7 +4,7 @@ def get_navbar():
     return html.Div([
         dcc.Link("🚀 Space Missions", href="/home", style=link_style),
         dcc.Link("👩‍🚀 Profiles", href="/profiles", style=link_style),
-        dcc.Link("📖 Mission Logs", href="/info", style=link_style),
+        dcc.Link("📖 Mission Logs", href="/logs", style=link_style),
     ], style={
         'backgroundColor': '#111',
         'padding': '10px',

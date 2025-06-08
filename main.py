@@ -4,7 +4,7 @@ from dash import dcc, html, Input, Output
 #from app import app
 from home import get_home_layout
 from profiles import get_profiles_layout
-from info import get_info_layout
+from info import get_info_layout, get_mission_detail_layout
 from seaborn import color_palette
 import matplotlib.colors as mcolors
 from callbacks.sidebar_callbacks import register_sidebar_callbacks
@@ -16,6 +16,7 @@ from visualisation.planets_figure import get_planet_layout, register_planet_call
 from preprocessing.color_palette_generator import generate_country_colors
 from preprocessing.loadDatasets import load_datasets, get_country_list
 from utils.min_max_setter import set_max_count_to_app
+from profiles import register_profiles_callbacks
 
 DATASET_MISSIONS_PATH = "datasets/final_dataset_missions.csv"
 DATASET_ASTRONAUTS_PATH = "datasets/astronauts.csv"
@@ -47,6 +48,7 @@ app.layout = html.Div([
     dcc.Store(id="initial-start-position"),
     dcc.Store(id="animation-index"),
     dcc.Store(id="is-playing"),
+    dcc.Store(id="clicked-mission"),
 ])
 
 @app.callback(Output('page-content', 'children'), Input('url', 'pathname'))
@@ -55,8 +57,11 @@ def display_page(pathname):
         return get_home_layout(app)
     elif pathname.startswith('/profiles'):
         return get_profiles_layout(app, available_countries)
-    elif pathname.startswith('/info'):
+    elif pathname.startswith('/logs'):
         return get_info_layout(app, pathname)
+    elif pathname.startswith('/mission'):
+        mission_id = int(pathname.split('/mission/')[1])
+        return get_mission_detail_layout(app, mission_id)
     else:
         return html.Div("404 Page Not Found")
 
@@ -66,6 +71,7 @@ register_sidebar_callbacks(app)
 register_map_callbacks(app)
 register_planet_callbacks(app)
 register_active_years_callbacks(app)
+register_profiles_callbacks(app, missions_df)
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -67,6 +67,10 @@ def add_milestone_traces(fig, milestones, max_y, step=10):
 
 def add_group_scatter_traces(fig, filtered_df, group_column, x_column, color_map, name_y_map, hover_data_cols):
     for name, group in filtered_df.groupby(group_column):
+        if 'Detail' in group.columns:
+            customdata = group['Detail']
+        else:
+            customdata = [None] * len(group)
         fig.add_trace(go.Scatter(
             x=group[x_column],
             y=[name_y_map[name]] * len(group),
@@ -77,7 +81,8 @@ def add_group_scatter_traces(fig, filtered_df, group_column, x_column, color_map
                 "<br>".join([f"{col}: {row[col]}" for col in hover_data_cols])
                 for _, row in group.iterrows()
             ],
-            hoverinfo="text"
+            hoverinfo="text",
+            customdata=customdata,
         ))
 
 def add_trajectory_lines(fig, filtered_df, group_column, x_column, color_map, name_y_map):
