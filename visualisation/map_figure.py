@@ -1,6 +1,7 @@
 import numpy as np
 from dash.dependencies import Output, Input, State
 import plotly.express as px
+from design.color_palettes import PALETTE
 
 def map_fig(csv_data, max_missions, precision=2, max_size=40):
     csv_data = csv_data.copy()
@@ -18,7 +19,8 @@ def map_fig(csv_data, max_missions, precision=2, max_size=40):
         size='marker_size',
         hover_name='count',
         projection='natural earth',
-        size_max=grouped['marker_size'].max()
+        size_max=grouped['marker_size'].max(),
+        #color_discrete_sequence=[PALETTE['primary']] # TODO 
     )
 
     fig.update_geos(
@@ -32,5 +34,7 @@ def map_fig(csv_data, max_missions, precision=2, max_size=40):
         margin=dict(l=0, r=0, t=0, b=0),
         uirevision=True,
     )
+
+    # TODO fix hover info
 
     return fig

@@ -1,25 +1,7 @@
 from dash import html, dcc
+from design.color_palettes import PALETTE
+from design.fonts import FONT_FAMILY, FONT_LINK
 
-# Google Fonts import (add this to your layout)
-font_link = html.Link(
-    rel="stylesheet",
-    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&family=Roboto:wght@400&display=swap"
-)
-
-# Color palette
-PALETTE = {
-    'background': '#181B2A',
-    'primary': '#4F8EF7',
-    'secondary': '#23263A',
-    'accent': '#F7B32B',
-    'text': '#FFFFFF',
-    'button': '#4F8EF7',
-    'button_hover': '#356AC3',
-    'input_bg': '#23263A',
-    'input_border': '#4F8EF7'
-}
-
-FONT_FAMILY = "'Montserrat', 'Roboto', sans-serif"
 
 link_style = {
     'textDecoration': 'none',
@@ -69,7 +51,7 @@ def get_navbar():
         'fontWeight': 600
     }
     return html.Div([
-        font_link,
+        FONT_LINK,
         dcc.Link("🚀 Space Missions", href="/home", style=link_style),
         dcc.Link("👩‍🚀 Astronauts", href="/astronauts", style=link_style),
         dcc.Link("🏢 Companies", href="/companies", style=link_style),

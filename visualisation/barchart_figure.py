@@ -24,6 +24,15 @@ def barchart_fig(data, color_palette, top_n=9):
         text='Country'
     )
 
+    # Add rounded edges to bars
+    for trace in fig.data:
+        trace.marker.line.width = 0
+        trace.marker.line.color = 'rgba(0,0,0,0)'
+        trace.marker.opacity = 1
+        trace.marker.pattern = None
+        trace.marker.cornerradius = 8  # <-- This works in Plotly 5.16+ (if installed)
+
+
     fig.update_layout(
         yaxis=dict(
             categoryorder='total ascending',
@@ -37,4 +46,7 @@ def barchart_fig(data, color_palette, top_n=9):
         paper_bgcolor='rgba(0,0,0,0)',
         showlegend=False
     )
+
+    # TODO mission count: either hover info or number in brackets
+
     return fig

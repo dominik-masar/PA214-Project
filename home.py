@@ -16,7 +16,7 @@ def get_home_layout(app):
             html.Div(get_planet_layout(), style={'width': '10%', 'height': '100%', 'display': 'inline-block'}),
             html.Div([dcc.Graph(id='map-fig', figure=map_figure)], style={'width': '70%', 'height': '100%', 'display': 'inline-block'}),
             html.Div(id='sidebar-fig', style={'width': '20%', 'height': '100%', 'display': 'inline-block'}),
-        ], style={'display': 'flex', 'gap': '5%', 'height': '50%', 'paddingTop': '2%'}),
-        html.Div(get_timeline_layout(), style={'width': '100%', 'height': '5%', 'paddingTop': '2%', 'display': 'inline-block'}),
+        ], style={'display': 'flex', 'gap': '5%', 'height': '50%', 'paddingTop': '2%', 'paddingLeft': '2%', 'paddingRight': '2%'}),
+        html.Div(get_timeline_layout(), style={'width': '96%', 'height': '5%', 'paddingTop': '2%', 'paddingLeft': '2%', 'paddingRight': '2%', 'display': 'inline-block'}),
         ])
 

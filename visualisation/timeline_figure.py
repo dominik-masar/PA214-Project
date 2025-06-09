@@ -3,7 +3,8 @@ from dash import dcc, html, callback_context
 from dash.dependencies import Output, Input, State
 from dash.exceptions import PreventUpdate
 import dash_daq as daq
-from navbar import PALETTE, FONT_FAMILY # TODO place it somewhere else
+from design.color_palettes import PALETTE
+from design.fonts import FONT_FAMILY
 
 min_year = 1950
 max_year = 2030
