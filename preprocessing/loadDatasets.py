@@ -12,8 +12,7 @@ def load_datasets(mission_path, astronauts_path):
     return missions_df, astronauts_df
 
 
-def get_country_list(missions_df, astronauts_df):
-    countries = astronauts_df['Profile.Nationality'].dropna().unique()
-    countries = set(countries).union(set(missions_df['Country'].dropna().unique()))
+def get_country_list(df, column):
+    countries = df[column].dropna().unique()
     countries = sorted(countries)
     return countries

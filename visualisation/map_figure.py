@@ -31,7 +31,6 @@ def map_fig(csv_data, max_missions, precision=2, max_size=40):
     fig.update_layout(
         margin=dict(l=0, r=0, t=0, b=0),
         uirevision=True,
-        height=700
     )
 
     return fig

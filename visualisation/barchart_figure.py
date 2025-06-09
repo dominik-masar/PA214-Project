@@ -33,7 +33,6 @@ def barchart_fig(data, color_palette, top_n=9):
             zeroline=False
         ),
         margin=dict(l=0, r=0, t=0, b=0),
-        height=700,
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
         showlegend=False

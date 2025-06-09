@@ -27,7 +27,8 @@ missions_df, astronauts_df = load_datasets(mission_path=DATASET_MISSIONS_PATH, a
 palette = color_palette("hls", 100)
 hex_colors = [mcolors.to_hex(c) for c in palette]
 color_map = generate_country_colors(missions_df, column='Country')
-available_countries = get_country_list(missions_df, astronauts_df)
+missions_countries = get_country_list(missions_df, 'Country')
+astronauts_countries = get_country_list(astronauts_df, 'Profile.Nationality')
 
 app = dash.Dash(__name__, suppress_callback_exceptions=True)
 #app = dash.Dash(__name__)
@@ -57,9 +58,9 @@ def display_page(pathname):
     if pathname == '/' or pathname == '/home':
         return get_home_layout(app)
     elif pathname == '/astronauts':
-        return get_profiles_layout(app, available_countries, view_type='astronauts')
+        return get_profiles_layout(app, astronauts_countries, view_type='astronauts')
     elif pathname == '/companies':
-        return get_profiles_layout(app, available_countries, view_type='companies')
+        return get_profiles_layout(app, missions_countries, view_type='companies')
     elif pathname.startswith('/logs'):
         return get_info_layout(app, pathname)
     elif pathname.startswith('/mission'):

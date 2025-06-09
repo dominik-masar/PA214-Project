@@ -1,7 +1,7 @@
 
 from dash import html, dcc, Input, Output, callback, State
 from visualisation.active_years_figure import get_active_years_fig
-from preprocessing.loadDatasets import get_country_list
+
 from navbar import get_navbar
 import dash
 
@@ -10,16 +10,34 @@ import dash
 def get_profiles_layout(app, available_countries, view_type='astronauts'):
     return html.Div([
         get_navbar(),
-        html.H2("Astronauts" if view_type == 'astronauts' else "Companies"),
-        dcc.Dropdown(
-            id='country-dropdown',
-            options=[{'label': c, 'value': c} for c in sorted(available_countries)],
-            value='USA',
-            clearable=False
+        html.Div(
+            [
+            html.H2(
+                "Astronauts Active Years" if view_type == 'astronauts' else "Companies Active Years",
+                style={'margin': '0', 'flex': '1', 'textAlign': 'left'}
+            ),
+            dcc.Dropdown(
+                id='country-dropdown',
+                options=[{'label': 'All', 'value': 'all'}] + [{'label': c, 'value': c} for c in sorted(available_countries)],
+                value='USA',
+                clearable=False,
+                style={'width': '300px', 'marginLeft': 'auto', 'marginRight': '10px'}
+            ),
+            ],
+            style={
+            'display': 'flex',
+            'alignItems': 'center',
+            'justifyContent': 'space-between',
+            'marginTop': '20px',
+            'marginBottom': '20px'
+            }
         ),
-        dcc.Graph(id='active-years-fig', config={'scrollZoom': True}, style={'height': '600px'}),
+        dcc.Graph(
+            id='active-years-fig',
+            config={'scrollZoom': False}
+        ),
         dcc.Store(id='view-type', data=view_type)
-    ])
+        ])
 
 def register_profiles_callbacks(app, missions_df):
     @app.callback(
