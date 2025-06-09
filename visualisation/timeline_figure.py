@@ -4,7 +4,6 @@ from dash.dependencies import Output, Input, State
 from dash.exceptions import PreventUpdate
 import dash_daq as daq
 from design.color_palettes import PALETTE
-from design.fonts import FONT_FAMILY
 
 min_year = 1950
 max_year = 2030
@@ -17,7 +16,6 @@ play_button_style = {
     'color': PALETTE['text'],
     'fontSize': '16px',
     'cursor': 'pointer',
-    'fontFamily': FONT_FAMILY,
     'fontWeight': 600,
     'marginRight': '18px',
     'transition': 'background 0.2s'
@@ -26,7 +24,6 @@ toggle_style = {
     'backgroundColor': 'white',
     'borderRadius': '8px',
     'padding': '8px 18px',
-    'fontFamily': FONT_FAMILY,
     'fontWeight': 600,
     'color': PALETTE['secondary'],
     'display': 'flex',
@@ -61,7 +58,6 @@ def get_timeline_layout():
             html.Div([  # Container for label and toggle
                     html.Span(id='timeline-mode-label', style={
                         'marginRight': '12px',
-                        'fontFamily': FONT_FAMILY,
                         'fontWeight': 600,
                         'color': PALETTE['secondary'],
                         'fontSize': '16px'
@@ -99,7 +95,7 @@ def get_timeline_layout():
                 'transform': 'rotate(180deg)',
                 'textAlign': 'center',
                 'fontWeight': 'bold',
-                'fontSize': '14px',
+                #'fontSize': '12px',
                 'height': '100px',
                 'display': 'flex',
                 'alignItems': 'center',

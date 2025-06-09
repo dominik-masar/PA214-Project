@@ -1,6 +1,5 @@
 from dash import html, dcc
 from design.color_palettes import PALETTE
-from design.fonts import FONT_FAMILY, FONT_LINK
 
 
 link_style = {
@@ -9,7 +8,6 @@ link_style = {
     'padding': '8px 18px',
     'borderRadius': '8px',
     'backgroundColor': PALETTE['secondary'],
-    'fontFamily': FONT_FAMILY,
     'fontWeight': 600,
     'transition': 'background 0.2s'
 }
@@ -25,7 +23,6 @@ def get_navbar():
         'marginRight': '-1px',
         'backgroundColor': PALETTE['input_bg'],
         'color': PALETTE['text'],
-        'fontFamily': FONT_FAMILY
     }
     search_button_style = {
         'padding': '8px 16px',
@@ -36,7 +33,6 @@ def get_navbar():
         'fontSize': '16px',
         'cursor': 'pointer',
         'marginRight': '4px',
-        'fontFamily': FONT_FAMILY,
         'fontWeight': 600
     }
     reset_button_style = {
@@ -47,11 +43,9 @@ def get_navbar():
         'color': PALETTE['secondary'],
         'fontSize': '16px',
         'cursor': 'pointer',
-        'fontFamily': FONT_FAMILY,
         'fontWeight': 600
     }
     return html.Div([
-        FONT_LINK,
         dcc.Link("🚀 Space Missions", href="/home", style=link_style),
         dcc.Link("👩‍🚀 Astronauts", href="/astronauts", style=link_style),
         dcc.Link("🏢 Companies", href="/companies", style=link_style),
@@ -76,6 +70,5 @@ def get_navbar():
         'gap': '24px',
         'fontSize': '18px',
         'color': PALETTE['text'],
-        'fontFamily': FONT_FAMILY,
         'alignItems': 'center'
     })

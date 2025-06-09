@@ -86,14 +86,14 @@ def get_mission_detail_layout(app, mission_id):
         html.Div([
             html.H2(mission["Detail"]),
             html.P(f"📍 Location: {mission['Location']}"),
-            html.P(f"🚀 Rocket: {mission['Rocket'] or 'N/A'}"),
+            #html.P(f"🚀 Rocket: {mission['Rocket'] or 'N/A'}"),
             html.P(f"🛰️ Company: {mission['Company Name']}"),
             html.P(f"📅 Date: {mission['Datum']}"),
             html.P(f"🌌 Goal: {mission['Mission Goal']}"),
             html.P(f"🟢 Mission Status: {mission['Status Mission']}"),
             html.P(f"🛠️ Rocket Status: {mission['Status Rocket']}"),
             html.Details([
-                html.Summary("🔎 Wikipedia Summary"),
+                html.Summary("🔎 Wikipedia"),
                 html.P(mission.get("Wikipedia_Summary", "No summary available."))
             ]),
             dcc.Link("← Show All Mission Logs", href="/logs/1", style={'marginTop': '30px', 'display': 'block'})

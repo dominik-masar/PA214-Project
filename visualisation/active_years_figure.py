@@ -36,13 +36,28 @@ def get_settings(view_type, selected_country, missions_df, astronauts_df):
         if selected_country == 'all':
             settings.filtered_df = astronauts_df
         else:
-            settings.filtered_df = astronauts_df[astronauts_df['Profile.Nationality'] == selected_country]
+           settings.filtered_df = astronauts_df[astronauts_df['Profile.Nationality'] == selected_country]
+
         settings.group_column = 'Profile.Name'
         settings.x_column = 'Mission.Year'
         settings.y_column = 'Profile.Astronaut Numbers.Overall'
-        settings.hover_cols = ['Profile.Name', 'Profile.Nationality', 'Mission.Role', 'Mission.Year', 'Mission.Name']
+        settings.hover_cols = ["Profile.Gender","Profile.Birth Year","Profile.Nationality","Profile.Military",
+                               "Mission.Name", "Mission.Role","Mission.Year",
+                               "Profile.Selection.Year", "Profile.Selection.Group","Profile.Lifetime Statistics.Mission count"]
+        # Optional: map column names to custom labels for hover info
+        settings.hover_labels = {
+            "Profile.Gender": "Gender",
+            "Profile.Birth Year": "Birth Year",
+            "Profile.Nationality": "Nationality",
+            "Profile.Military": "Military",
+            "Mission.Name": "Mission",
+            "Mission.Role": "Role",
+            "Mission.Year": "Mission Year",
+            "Profile.Selection.Year": "Selection Year",
+            "Profile.Selection.Group": "Selection Group",
+            "Profile.Lifetime Statistics.Mission count": "Total Missions"
+        }
         settings.y_label = 'Astronaut'
-        settings.point_opacity = 0.7
         settings.point_size = 12
         settings.unique_names = settings.filtered_df[settings.group_column].unique()
         settings.height = max(250, 20 * len(settings.unique_names))
@@ -51,12 +66,14 @@ def get_settings(view_type, selected_country, missions_df, astronauts_df):
             settings.filtered_df = missions_df
         else:
             settings.filtered_df = missions_df[missions_df['Country'] == selected_country]
+
         settings.group_column = 'Company Name'
         settings.x_column = 'Year'
         settings.y_column = 'Company ID'
-        settings.hover_cols = ['Company Name', 'Location', 'Detail']
+        #settings.hover_cols = ['Company Name', 'Location', 'Detail']
+        settings.hover_cols = ['Detail']
+        settings.hover_labels = {"Detail": ""}
         settings.y_label = 'Company'
-        settings.point_opacity = 0.2
         settings.point_size = 12
         settings.unique_names = settings.filtered_df[settings.group_column].unique()
         settings.height = max(250, 40 * len(settings.unique_names))
@@ -89,22 +106,52 @@ def add_milestone_traces(fig, milestones, max_y, step=1):
 
 def add_group_scatter_traces(fig, settings, name_y_map, color_map):   
     for name, group in settings.filtered_df.groupby(settings.group_column):
-        if 'Detail' in group.columns:
-            customdata = group['Detail']
-        else:
-            customdata = [None] * len(group)
+        # Group by x_column (year), aggregate rows that overlap
+        grouped_by_year = group.groupby(settings.x_column)
+        x_vals = []
+        y_vals = []
+        texts = []
+        customdatas = []
+        opacities = []
+        for year, year_group in grouped_by_year:
+            x_vals.append(year)
+            y_vals.append(name_y_map[name])
+            # Aggregate hover info for all missions in this year
+            hover_lines = []
+            for _, row in year_group.iterrows():
+                hover_line = "<br>".join([
+                    f"{settings.hover_labels.get(col, col)}: {row[col]}"
+                    for col in settings.hover_cols
+                ])
+                hover_lines.append(hover_line)
+            # Add company name and year as first line
+            header = f"{name} ({int(year)})"
+            text = header + "<br><b></b><br>" + ("<br>".join(hover_lines) if len(hover_lines) > 1 else hover_lines[0])
+            texts.append(text)
+            if 'Detail' in year_group.columns:
+                customdatas.append(", ".join(str(d) for d in year_group['Detail']))
+            else:
+                customdatas.append(None)
+
+            if settings.group_column == 'Company Name':
+                # For companies, change opacity based on number of missions in the year
+                count = len(year_group)
+                if count <= 2:
+                    opacities.append(0.3)
+                elif 3 <= count <= 6:
+                    opacities.append(0.6)
+                else:
+                    opacities.append(1.0)
+
         fig.add_trace(go.Scatter(
-            x=group[settings.x_column],
-            y=[name_y_map[name]] * len(group),
+            x=x_vals,
+            y=y_vals,
             mode='markers',
             name=name,
-            marker=dict(color=color_map[name], opacity=settings.point_opacity, size=settings.point_size),
-            text=[
-                "<br>".join([f"{col}: {row[col]}" for col in settings.hover_cols])
-                for _, row in group.iterrows()
-            ],
+            marker=dict(color=color_map[name], opacity=opacities, size=settings.point_size),
+            text=texts,
             hoverinfo="text",
-            customdata=customdata,
+            customdata=customdatas,
         ))
 
 def add_trajectory_lines(fig, settings, name_y_map, color_map, ):
