@@ -8,6 +8,29 @@ import dash
 
 
 def get_profiles_layout(app, available_countries, view_type='astronauts'):
+    # Count records for each country
+    if view_type == 'astronauts':
+        df = app.astronauts_df
+        country_col = 'Profile.Nationality'
+        group_col = 'Profile.Name'
+    else:
+        df = app.missions_df
+        country_col = 'Country'
+        group_col = 'Company Name'
+
+    country_counts = (
+        df.groupby(country_col)[group_col].nunique()
+        .reindex(sorted(available_countries), fill_value=0)
+    )
+
+    dropdown_options = [
+        {'label': f"All ({df[group_col].nunique()})", 'value': 'all'}
+    ] + [
+        {'label': f"{country} ({country_counts[country]})", 'value': country}
+        for country in sorted(available_countries)
+    ]
+
+
     return html.Div([
         get_navbar(),
         html.Div(
@@ -18,7 +41,7 @@ def get_profiles_layout(app, available_countries, view_type='astronauts'):
             ),
             dcc.Dropdown(
                 id='country-dropdown',
-                options=[{'label': 'All', 'value': 'all'}] + [{'label': c, 'value': c} for c in sorted(available_countries)],
+                options=dropdown_options,
                 value='USA',
                 clearable=False,
                 style={'width': '300px', 'marginLeft': 'auto', 'marginRight': '10px'}
