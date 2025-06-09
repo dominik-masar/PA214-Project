@@ -102,7 +102,8 @@ def add_milestone_traces(fig, milestones, max_y, step=1):
             mode="lines",
             line=dict(dash="dash", color="rgba(128,0,128,0.2)", width=2),
             showlegend=False,
-            hoverinfo="skip"
+            hoverinfo="skip",
+            customdata=[None, None],
         ))
 
 def add_group_scatter_traces(fig, settings, name_y_map, color_map):   
