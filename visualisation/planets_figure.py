@@ -6,10 +6,10 @@ df = pd.read_csv("datasets/final_dataset_missions.csv")
 
 # --- Planety a styly ---
 textures = {
-    "Earth": "/assets/images/earth.PNG",
-    "Mars": "/assets/images/mars.PNG",
-    "Moon": "/assets/images/moon.PNG",
-    "Milky Way": "/assets/images/milkyway.png"
+    "Earth": "/assets/images/earth_orbit.png",
+    "Solar System": "/assets/images/solar_system.png",
+    "Moon": "/assets/images/moon.png",
+    "Outer Space": "/assets/images/outer_space.png"
 }
 
 planet_ids = {name: name.lower().replace(" ", "-") + "-id" for name in textures}
@@ -17,9 +17,9 @@ planet_ids = {name: name.lower().replace(" ", "-") + "-id" for name in textures}
 base_style = {
     "backgroundSize": "cover",
     "borderRadius": "50%",
-    "width": "70px",
-    "height": "70px",
-    "margin": "30px",
+    "width": "12vh",
+    "height": "12vh",
+    "margin": "0px",
     "transition": "transform 0.4s ease, box-shadow 0.4s ease"
 }
 
@@ -35,24 +35,27 @@ def get_planet_layout():
 
         html.Div([
             html.Div(id=planet_ids[name], style={
-                **base_style,
-                "margin": "5px",
-                "backgroundImage": f"url('{path}')",
-                "position": "relative",
-                "display": "flex",
-                "justifyContent": "center",
-                "alignItems": "center",
-                "color": "white",
-                "fontWeight": "bold",
-                "fontSize": "16px",
-                "textShadow": "0 0 4px black"
+            **base_style,
+            "width": "12vh",
+            "height": "12vh",
+            "margin": "0px",
+            "backgroundImage": f"url('{path}')",
+            "position": "relative",
+            "display": "flex",
+            "justifyContent": "center",
+            "alignItems": "center",
+            "color": "white",
+            "fontWeight": "bold",
+            "fontSize": "20px",
+            "textShadow": "0 0 4px black"
             }, children="0")
             for name, path in textures.items()
         ], style={
             "display": "flex",
+            "flexDirection": "column",  # vertical stacking
             "justifyContent": "center",
             "alignItems": "center",
-            "gap": "10px",
+            #"gap": "10px",
             "padding": "0",
         })
     ], style={"margin": "0px", "padding": "0px"})
@@ -77,9 +80,9 @@ def register_planet_callbacks(app):
         # Počty misí podle zemí (příklad, můžeš upravit podle potřeby)
         planet_values = {
             "Earth": str(filtered[filtered['Mission Goal'] == 'Earth orbit'].shape[0]),
-            "Mars": str(filtered[filtered['Mission Goal'] == 'Solar system'].shape[0]),
+            "Solar System": str(filtered[filtered['Mission Goal'] == 'Solar system'].shape[0]),
             "Moon": str(filtered[filtered['Mission Goal'] == 'Moon'].shape[0]),
-            "Milky Way": str(filtered[filtered['Mission Goal'] == 'Outer space'].shape[0]),
+            "Outer Space": str(filtered[filtered['Mission Goal'] == 'Outer Space'].shape[0]),
         }
 
         children_outputs = []
@@ -102,7 +105,7 @@ def register_planet_callbacks(app):
                     "fontWeight": "bold",
                     "fontSize": "18px",
                     "textShadow": "0 0 4px black",
-                    **pop_style
+                    #**pop_style
                 }
             else:
                 style = {

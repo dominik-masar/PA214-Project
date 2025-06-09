@@ -3,9 +3,36 @@ from dash import dcc, html, callback_context
 from dash.dependencies import Output, Input, State
 from dash.exceptions import PreventUpdate
 import dash_daq as daq
+from navbar import PALETTE, FONT_FAMILY # TODO place it somewhere else
 
 min_year = 1950
 max_year = 2030
+
+play_button_style = {
+    'padding': '8px 18px',
+    'borderRadius': '8px',
+    'border': f"1px solid {PALETTE['button']}",
+    'backgroundColor': PALETTE['button'],
+    'color': PALETTE['text'],
+    'fontSize': '16px',
+    'cursor': 'pointer',
+    'fontFamily': FONT_FAMILY,
+    'fontWeight': 600,
+    'marginRight': '18px',
+    'transition': 'background 0.2s'
+}
+toggle_style = {
+    'backgroundColor': 'white',
+    'borderRadius': '8px',
+    'padding': '8px 18px',
+    'fontFamily': FONT_FAMILY,
+    'fontWeight': 600,
+    'color': PALETTE['secondary'],
+    'display': 'flex',
+    'alignItems': 'center',
+    'marginLeft': 'auto',  # Align to the right
+    'justifyContent': 'flex-end'
+}
 
 
 def get_timeline_layout():
@@ -29,15 +56,43 @@ def get_timeline_layout():
         dcc.Store(id="is-playing", data=False),
 
         html.Div([
-            daq.ToggleSwitch(
-                id='timeline-mode-toggle',
-                value=False,  # False = cumulative, True = floating
-                label=['Cumulative Mode', 'Floating Window Mode'],
-                style={'marginBottom': '10px'}
-            )
-        ], style={'marginBottom': '20px', 'display': 'flex', 'alignItems': 'center'}),
+            html.Button('Play', id='play-button', n_clicks=0, style=play_button_style),
+            html.Div([  # Container for label and toggle
+                    html.Span(id='timeline-mode-label', style={
+                        'marginRight': '12px',
+                        'fontFamily': FONT_FAMILY,
+                        'fontWeight': 600,
+                        'color': PALETTE['secondary'],
+                        'fontSize': '16px'
+                    }),
+                    daq.ToggleSwitch(
+                        id='timeline-mode-toggle',
+                        value=False,
+                        style=toggle_style
+                    )
+                ], style={
+                    'display': 'flex',
+                    'alignItems': 'center',
+                    'justifyContent': 'flex-end',
+                    #'flex': '1'
+            })
+        ], style={
+            'display': 'flex',
+            'alignItems': 'center',
+            'gap': '24px',
+            'width': '100%',
+            'justifyContent': 'space-between'
+            #'marginBottom': '18px'
+        }),
+        
 
-        html.Div(style={'display': 'flex', 'flexDirection': 'row', 'alignItems': 'flexStart'}, children=[
+        html.Div(style={
+            'display': 'flex',
+            'flexDirection': 'row',
+            'alignItems': 'flexStart',
+            'width': '100%',
+            'boxSizing': 'border-box'
+        }, children=[
             html.Div("Mission Count", style={
                 'writingMode': 'vertical-rl',
                 'transform': 'rotate(180deg)',
@@ -53,13 +108,14 @@ def get_timeline_layout():
             html.Div([
                 html.Div(id='timeline-container', style={
                     'position': 'relative',
-                    'width': '1000px',
-                    'height': '100px',
+                    'width': '100%',
+                    'height': '100%',
                     'border': '1px solid #ddd',
                     'backgroundColor': '#fdfdfd',
                     'overflow': 'hidden',
                     'marginBottom': '10px',
-                    'marginLeft': f'-{1000 / len(years) / 2}px'
+                    'marginLeft': '0px',
+                    'boxSizing': 'border-box'
                 }),
                 html.Div(
                     dcc.RangeSlider(
@@ -73,18 +129,17 @@ def get_timeline_layout():
                         allowCross=False,
                     ),
                     style={
-                        'width': '1032px',
+                        'width': '100%',
                         'position': 'relative',
                         'marginTop': '-19px',
-                        'left': '-23px',
+                        'left': '0px',
                         'zIndex': '999'
                     }
                 )
-            ])
+            ], style={'flex': '1 1 0%', 'minWidth': '0'})
         ]),
-        html.Button('Play', id='play-button', n_clicks=0, style={'marginBottom': '10px'}),
         dcc.Interval(id='interval-component', interval=1000, n_intervals=0, disabled=True),
-    ])
+    ], style={'width': '100%', 'boxSizing': 'border-box'})
 
 def _hex_to_rgba(hex_color, alpha):
     hex_color = hex_color.lstrip('#')
@@ -150,10 +205,10 @@ def register_timeline_callbacks(app):
                     points_and_lines.append(html.Div(
                         style={
                             'position': 'absolute',
-                            'top': f'{y_offset}px',
-                            'left': f'{left_px}px',
-                            'width': f'{point_width_px}px',
-                            'height': f'{seg_height}px',
+                            'top': f'{(y_offset / container_height) * 100}%',
+                            'left': f'{(i / len(years)) * 100}%',
+                            'width': f'{(1 / len(years)) * 100}%',
+                            'height': f'{(seg_height / container_height) * 100}%',
                             'backgroundColor': color,
                             'borderLeft': '1px solid white',
                             'boxSizing': 'border-box',
@@ -165,10 +220,10 @@ def register_timeline_callbacks(app):
                 points_and_lines.append(html.Div(
                     style={
                         'position': 'absolute',
-                        'top': f'{top_px}px',
-                        'left': f'{left_px}px',
-                        'width': f'{point_width_px}px',
-                        'height': f'{height_px}px',
+                        'top': f'{(top_px / container_height) * 100}%',
+                        'left': f'{(i / len(years)) * 100}%',
+                        'width': f'{(1 / len(years)) * 100}%',
+                        'height': f'{(height_px / container_height) * 100}%',
                         'backgroundColor': f'rgba(128,128,128,{alpha})',
                         'borderLeft': '1px solid transparent',
                         'boxSizing': 'border-box',
@@ -240,3 +295,10 @@ def register_timeline_callbacks(app):
 
         else:
             raise PreventUpdate
+        
+    @app.callback(
+        Output('timeline-mode-label', 'children'),
+        Input('timeline-mode-toggle', 'value')
+    )
+    def update_mode_label(toggle_value):
+        return "Floating Window Mode" if toggle_value else "Cumulative Mode"
