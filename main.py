@@ -35,6 +35,8 @@ app = dash.Dash(__name__, suppress_callback_exceptions=True)
 app.title = "Space Missions"
 app.missions_df = missions_df
 app.astronauts_df = astronauts_df
+app.astronauts_country_counts = astronauts_df.groupby('Profile.Nationality')['Profile.Name'].nunique()
+app.missions_country_counts = missions_df.groupby('Country')['Company Name'].nunique()
 app.color_map = color_map
 
 set_max_count_to_app(app, missions_df)

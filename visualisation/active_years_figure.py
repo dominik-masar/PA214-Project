@@ -29,14 +29,14 @@ palette = qualitative.Plotly
 # palette = qualitative.Prism
 
 
-def get_settings(view_type, selected_country, missions_df, astronauts_df):
+def get_settings(app, view_type, selected_country):
     # TODO allow selected_country == 'all'
     settings = type('Settings', (), {})()
     if view_type == 'astronauts':
         if selected_country == 'all':
-            settings.filtered_df = astronauts_df
+            settings.filtered_df = app.astronauts_df
         else:
-           settings.filtered_df = astronauts_df[astronauts_df['Profile.Nationality'] == selected_country]
+           settings.filtered_df = app.astronauts_df[app.astronauts_df['Profile.Nationality'] == selected_country]
 
         settings.group_column = 'Profile.Name'
         settings.x_column = 'Mission.Year'
@@ -60,12 +60,13 @@ def get_settings(view_type, selected_country, missions_df, astronauts_df):
         settings.y_label = 'Astronaut'
         settings.point_size = 12
         settings.unique_names = settings.filtered_df[settings.group_column].unique()
-        settings.height = max(250, 20 * len(settings.unique_names))
+        settings.height = max(250, 30 * len(settings.unique_names))
+        #settings.height = max(250, 20 * len(settings.unique_names))
     else:
         if selected_country == 'all':
-            settings.filtered_df = missions_df
+            settings.filtered_df = app.missions_df
         else:
-            settings.filtered_df = missions_df[missions_df['Country'] == selected_country]
+            settings.filtered_df = app.missions_df[app.missions_df['Country'] == selected_country]
 
         settings.group_column = 'Company Name'
         settings.x_column = 'Year'
@@ -175,8 +176,8 @@ def add_trajectory_lines(fig, settings, name_y_map, color_map, ):
             hoverinfo='skip'
         ))
 
-def get_active_years_fig(missions_df, astronauts_df, view_type='companies', selected_country='USA'):
-    settings = get_settings(view_type, selected_country, missions_df, astronauts_df)
+def get_active_years_fig(app, view_type='companies', selected_country='USA'):
+    settings = get_settings(app, view_type, selected_country)
     color_map = assign_colors(settings.unique_names, palette)
     name_y_map = {name: i for i, name in enumerate(settings.unique_names)}
 
@@ -207,6 +208,8 @@ def get_active_years_fig(missions_df, astronauts_df, view_type='companies', sele
         margin=dict(t=20) 
     )
 
+    #fig.update_yaxes(autorange="reversed") # TODO proc to rozbiji astronauts?
+
     return fig
 
 
@@ -217,4 +220,4 @@ def register_active_years_callbacks(app):
          Input('country-dropdown', 'value')]
     )
     def update_active_years_fig(selected_view, selected_country):
-        return get_active_years_fig(app.missions_df, app.astronauts_df, view_type=selected_view, selected_country=selected_country)
+        return get_active_years_fig(app, view_type=selected_view, selected_country=selected_country)

@@ -13,15 +13,15 @@ def get_profiles_layout(app, available_countries, view_type='astronauts'):
         df = app.astronauts_df
         country_col = 'Profile.Nationality'
         group_col = 'Profile.Name'
+        country_counts = app.astronauts_country_counts.reindex(sorted(available_countries), fill_value=0)
+        default_country = 'Germany'
     else:
         df = app.missions_df
         country_col = 'Country'
         group_col = 'Company Name'
-
-    country_counts = (
-        df.groupby(country_col)[group_col].nunique()
-        .reindex(sorted(available_countries), fill_value=0)
-    )
+        country_counts = app.missions_country_counts.reindex(sorted(available_countries), fill_value=0)
+        default_country = 'USA'
+        
 
     dropdown_options = [
         {'label': f"All ({df[group_col].nunique()})", 'value': 'all'}
@@ -42,7 +42,7 @@ def get_profiles_layout(app, available_countries, view_type='astronauts'):
             dcc.Dropdown(
                 id='country-dropdown',
                 options=dropdown_options,
-                value='USA',
+                value=default_country,
                 clearable=False,
                 style={'width': '300px', 'marginLeft': 'auto', 'marginRight': '10px'}
             ),
