@@ -5,8 +5,8 @@ from dash.exceptions import PreventUpdate
 import dash_daq as daq
 from design.color_palettes import PALETTE
 
-min_year = 1950
-max_year = 2030
+min_year = 1957
+max_year = 2020
 
 play_button_style = {
     'padding': '8px 18px',
@@ -277,11 +277,10 @@ def register_timeline_callbacks(app):
         elif trigger_id == 'interval-component' and is_playing:
             if mode == 'cumulative':
                 start, end = slider_range
-                new_end = start + animation_index
-                if new_end > end:
-                    new_end = slider_range[1]
-                    animation_index = -1
-                return [start, new_end], window_size, start_pos, animation_index + 1, slider_range
+                new_end = end + 1
+                if new_end > max_year:
+                    new_end = start
+                return [start, new_end], window_size, start_pos, animation_index + 1, [start, new_end]
             else:
                 new_start = start_pos + 1
                 new_end = new_start + window_size - 1
