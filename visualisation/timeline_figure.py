@@ -7,6 +7,7 @@ from design.color_palettes import PALETTE
 
 min_year = 1957
 max_year = 2020
+len_years = max_year - min_year + 1
 
 play_button_style = {
     'padding': '0.5em 1.2em',
@@ -34,8 +35,6 @@ toggle_style = {
 
 def get_timeline_layout():
     df = dash.get_app().missions_df
-    min_year = int(df['Year'].min())
-    max_year = int(df['Year'].max())
     years = list(range(min_year, max_year + 1))
 
     return html.Div([
@@ -162,8 +161,6 @@ def register_timeline_callbacks(app):
             df = app.missions_df
 
         color_map = app.color_map
-        min_year = int(df['Year'].min())
-        max_year = int(df['Year'].max())
         years = list(range(min_year, max_year + 1))
         missions_by_year = df.groupby('Year').size().reindex(years, fill_value=0)
         max_count = missions_by_year.max()
@@ -179,8 +176,8 @@ def register_timeline_callbacks(app):
             total_missions = len(year_df)
             height_ratio = total_missions / max_count if max_count > 0 else 0
             height_pct = height_ratio * 100
-            bar_width_pct = 100 / (len(years)+1)
-            left_pct = (i / (len(years) + 1)) * 100 + bar_width_pct / 2
+            bar_width_pct = 100 / (len_years + 1)
+            left_pct = (i / (len_years + 1)) * 100 + bar_width_pct / 2
             top_pct = 100 - height_pct
 
             is_selected = start_year <= year <= end_year
