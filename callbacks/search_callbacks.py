@@ -27,7 +27,7 @@ def register_search_callbacks(app):
         return {"search_triggered": False}
     
     @app.callback(
-        Output('mission-logs', 'value'),
+        Output('mission-logs', 'children'),
         Input('trigger-update', 'data'),
         State('url', 'pathname'),
         prevent_initial_call=True
@@ -44,26 +44,11 @@ def register_search_callbacks(app):
     )
     def update_output(trigger_data, year_range):
         start, end = year_range
+        df = app.missions_df
 
         if trigger_data and trigger_data['search_triggered']:
             df = app.filtered_df
-            filtered_df = df[(df['Year'] >= start) & (df['Year'] <= end)]
-            if filtered_df.empty:
-                return html.Div("No results found.")
 
-            return html.Div([
-                html.Ul([
-                    html.Li(f"{row['Detail']} ({row['Year']})")
-                    for _, row in filtered_df.iterrows()
-                ])
-            ], style={
-                'height': '100%',
-                'overflowY': 'scroll',
-                'border': '1px solid #ccc',
-                'padding': '10px'
-            })
-
-        df = app.missions_df
         filtered_df = df[(df['Year'] >= start) & (df['Year'] <= end)]
 
         fig = barchart_fig(filtered_df, app.color_map)
