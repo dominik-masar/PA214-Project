@@ -7,10 +7,12 @@ def register_search_callbacks(app):
     @app.callback(
         Output('search-input', 'value'),
         Output('trigger-update', 'data', allow_duplicate = True),
+        Input('url', 'pathname'),
         Input('reset-button', 'n_clicks'),
         prevent_initial_call=True
     )
-    def reset(n_clicks):
+    def reset(pathname, n_clicks):
+        app.filtered_df = app.missions_df
         return "", {"reset_triggered": True, "search_triggered": False}
     
 
@@ -23,8 +25,8 @@ def register_search_callbacks(app):
     def search(n_clicks, search_term):
         if search_term and search_term.strip():
             app.filtered_df = app.missions_df[app.missions_df['Detail'].str.contains(search_term, na=False, case=False)]
-            return {"search_triggered": True}
-        return {"search_triggered": False}
+            return {"reset_triggered": False, "search_triggered": True}
+        return {"reset_triggered": False, "search_triggered": False}
     
     @app.callback(
         Output('mission-logs', 'children'),
@@ -33,8 +35,7 @@ def register_search_callbacks(app):
         prevent_initial_call=True
     )
     def update_missions(trigger_data, pathname):
-        if trigger_data and trigger_data['search_triggered']:
-            return get_info_layout(app, pathname)
+        return get_info_layout(app, pathname)
 
 
     @app.callback(
