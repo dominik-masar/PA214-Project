@@ -11,6 +11,11 @@ details summary,
     font-family: 'Montserrat', 'Roboto', sans-serif !important;
 }
 
+body {
+    margin: 0;
+    padding: 0;
+}
+
 details p {
     font-family: 'Merriweather', serif !important;
     font-size: 1.05em;
