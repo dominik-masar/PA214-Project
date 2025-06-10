@@ -9,29 +9,28 @@ min_year = 1957
 max_year = 2020
 
 play_button_style = {
-    'padding': '8px 18px',
-    'borderRadius': '8px',
+    'padding': '0.5em 1.2em',
+    'borderRadius': '0.5em',
     'border': f"1px solid {PALETTE['button']}",
     'backgroundColor': PALETTE['button'],
     'color': PALETTE['text'],
-    'fontSize': '16px',
+    'fontSize': '1em',
     'cursor': 'pointer',
     'fontWeight': 600,
-    'marginRight': '18px',
+    'marginRight': '1em',
     'transition': 'background 0.2s'
 }
 toggle_style = {
     'backgroundColor': 'white',
-    'borderRadius': '8px',
-    'padding': '8px 18px',
+    'borderRadius': '0.5em',
+    'padding': '0.5em 1.2em',
     'fontWeight': 600,
     'color': PALETTE['secondary'],
     'display': 'flex',
     'alignItems': 'center',
-    'marginLeft': 'auto',  # Align to the right
+    'marginLeft': 'auto',
     'justifyContent': 'flex-end'
 }
-
 
 def get_timeline_layout():
     df = dash.get_app().missions_df
@@ -41,9 +40,9 @@ def get_timeline_layout():
 
     return html.Div([
         html.Div(id='year-display', style={
-            'fontSize': '18px',
+            'fontSize': '1.1em',
             'fontWeight': 'bold',
-            'marginBottom': '10px',
+            #'marginBottom': '0.5em',
             'color': 'darkblue'
         }),
         dcc.Store(id="selected-years", data=[min_year, max_year]),
@@ -55,63 +54,61 @@ def get_timeline_layout():
 
         html.Div([
             html.Button('Play', id='play-button', n_clicks=0, style=play_button_style),
-            html.Div([  # Container for label and toggle
-                    html.Span(id='timeline-mode-label', style={
-                        'marginRight': '12px',
-                        'fontWeight': 600,
-                        'color': PALETTE['secondary'],
-                        'fontSize': '16px'
-                    }),
-                    daq.ToggleSwitch(
-                        id='timeline-mode-toggle',
-                        value=False,
-                        style=toggle_style
-                    )
-                ], style={
-                    'display': 'flex',
-                    'alignItems': 'center',
-                    'justifyContent': 'flex-end',
-                    #'flex': '1'
+            html.Div([
+                html.Span(id='timeline-mode-label', style={
+                    'marginRight': '0.8em',
+                    'fontWeight': 600,
+                    'color': PALETTE['secondary'],
+                    'fontSize': '1em'
+                }),
+                daq.ToggleSwitch(
+                    id='timeline-mode-toggle',
+                    value=False,
+                    style=toggle_style
+                )
+            ], style={
+                'display': 'flex',
+                'alignItems': 'center',
+                'justifyContent': 'flex-end',
             })
         ], style={
             'display': 'flex',
             'alignItems': 'center',
-            'gap': '24px',
+            'gap': '1.5em',
             'width': '100%',
             'justifyContent': 'space-between'
-            #'marginBottom': '18px'
         }),
-        
 
         html.Div(style={
             'display': 'flex',
             'flexDirection': 'row',
             'alignItems': 'flexStart',
             'width': '100%',
-            'boxSizing': 'border-box'
+            'boxSizing': 'border-box',
+            'height': '70%'  # Let parent control overall height, this is for inner split
         }, children=[
             html.Div("Mission Count", style={
                 'writingMode': 'vertical-rl',
                 'transform': 'rotate(180deg)',
                 'textAlign': 'center',
                 'fontWeight': 'bold',
-                #'fontSize': '12px',
-                'height': '100px',
+                'height': '100%',
                 'display': 'flex',
                 'alignItems': 'center',
                 'justifyContent': 'center',
-                'marginRight': '5px'
+                'marginRight': '0.5em',
+                'fontSize': '0.9em'
             }),
             html.Div([
                 html.Div(id='timeline-container', style={
-                    'position': 'relative',
+                    'position': 'absolute',
+                    'top': 0,
+                    'left': 0,
                     'width': '100%',
-                    'height': '100%',
-                    'border': '1px solid #ddd',
-                    'backgroundColor': '#fdfdfd',
+                    'height': 'calc(100% - 2.0em)',  # Reserve space for slider
                     'overflow': 'hidden',
-                    'marginBottom': '10px',
-                    'marginLeft': '0px',
+                    'margin': '0',
+                    'padding': '0',
                     'boxSizing': 'border-box'
                 }),
                 html.Div(
@@ -127,16 +124,23 @@ def get_timeline_layout():
                     ),
                     style={
                         'width': '100%',
-                        'position': 'relative',
-                        'marginTop': '-19px',
-                        'left': '0px',
-                        'zIndex': '999'
+                        'position': 'absolute',
+                        'bottom': 0,
+                        'left': 0,
+                        'zIndex': 999,
+                        'margin': 0,
+                        'padding': 0
                     }
                 )
-            ], style={'flex': '1 1 0%', 'minWidth': '0'})
+            ], style={
+                'flex': '1 1 0%',
+                'minWidth': 0,
+                'height': '100%',
+                'position': 'relative'
+            })
         ]),
         dcc.Interval(id='interval-component', interval=1000, n_intervals=0, disabled=True),
-    ], style={'width': '100%', 'boxSizing': 'border-box'})
+    ], style={'width': '100%', 'height': '100%', 'boxSizing': 'border-box', 'display': 'flex', 'flexDirection': 'column'})
 
 def _hex_to_rgba(hex_color, alpha):
     hex_color = hex_color.lstrip('#')
@@ -166,22 +170,20 @@ def register_timeline_callbacks(app):
 
         mode = 'window' if mode_toggle else 'cumulative'
         start_year, end_year = selected_range
-        container_width = 1000
-        container_height = 100
-        point_width_px = container_width / len(years)
 
+        # Responsive: use 100% for width/height, parent controls actual size
         points_and_lines = []
 
         for i, year in enumerate(years):
             year_df = df[df['Year'] == year]
             total_missions = len(year_df)
             height_ratio = total_missions / max_count if max_count > 0 else 0
-            height_px = height_ratio * container_height
-            left_px = i * point_width_px
-            top_px = container_height - height_px
+            height_pct = height_ratio * 100
+            bar_width_pct = 100 / (len(years)+1)
+            left_pct = (i / (len(years) + 1)) * 100 + bar_width_pct / 2
+            top_pct = 100 - height_pct
 
             is_selected = start_year <= year <= end_year
-
             alpha = 1.0 if is_selected else 0.2
 
             if total_missions > 0:
@@ -193,19 +195,19 @@ def register_timeline_callbacks(app):
                 if others_count > 0:
                     segs['Others'] = others_count
 
-                y_offset = container_height
+                y_offset_pct = 100
                 for c, ct in segs.items():
-                    seg_height = (ct / max_count) * container_height
-                    y_offset -= seg_height
+                    seg_height_pct = (ct / max_count) * 100
+                    y_offset_pct -= seg_height_pct
                     base_color = color_map.get(c, '#888888')
                     color = _hex_to_rgba(base_color, alpha)
                     points_and_lines.append(html.Div(
                         style={
                             'position': 'absolute',
-                            'top': f'{(y_offset / container_height) * 100}%',
-                            'left': f'{(i / len(years)) * 100}%',
-                            'width': f'{(1 / len(years)) * 100}%',
-                            'height': f'{(seg_height / container_height) * 100}%',
+                            'top': f'{y_offset_pct}%',
+                            'left': f'{left_pct}%',
+                            'width': f'{bar_width_pct}%',
+                            'height': f'{seg_height_pct}%',
                             'backgroundColor': color,
                             'borderLeft': '1px solid white',
                             'boxSizing': 'border-box',
@@ -217,10 +219,10 @@ def register_timeline_callbacks(app):
                 points_and_lines.append(html.Div(
                     style={
                         'position': 'absolute',
-                        'top': f'{(top_px / container_height) * 100}%',
-                        'left': f'{(i / len(years)) * 100}%',
-                        'width': f'{(1 / len(years)) * 100}%',
-                        'height': f'{(height_px / container_height) * 100}%',
+                        'top': f'{top_pct}%',
+                        'left': f'{left_pct}%',
+                        'width': f'{bar_width_pct}%',
+                        'height': f'{height_pct}%',
                         'backgroundColor': f'rgba(128,128,128,{alpha})',
                         'borderLeft': '1px solid transparent',
                         'boxSizing': 'border-box',

@@ -5,13 +5,12 @@ def generate_country_colors(data, column='Country', fallback_palette='Set2'):
     manual_colors = {
         'USA': '#4F8EF7',     
         'Russia': '#F74F4F',    
+        'Kazakhstan': '#FFB84D',
         'Ukraine': '#F7B32B',   
-        'China': '#FFB84D',     
+        'China': '#FF8C8C',     
         'Germany': '#23263A',  
         'France': '#7EC4FF',  
-        'UK': '#FFD166',        
-        'Canada': '#F76E6E',    
-        'Japan': '#FF8C8C',
+        'UK': '#FFD166',
         'Others': "#C3C3C3",       
     }
 

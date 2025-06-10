@@ -46,7 +46,7 @@ def register_sidebar_callbacks(app):
                     for _, row in filtered_df.iterrows()
                 ])
             ], style={
-                'height': '700px',
+                'height': '100%',
                 'overflowY': 'scroll',
                 'border': '1px solid #ccc',
                 'padding': '10px'
@@ -56,4 +56,4 @@ def register_sidebar_callbacks(app):
         filtered_df = df[(df['Year'] >= start) & (df['Year'] <= end)]
 
         fig = barchart_fig(filtered_df, app.color_map)
-        return dcc.Graph(id='bar-fig', figure=fig, config={'staticPlot': True})
+        return dcc.Graph(id='bar-fig', figure=fig, config={'staticPlot': True}, style={'height': '100%', 'width': '100%', 'responsive': True})

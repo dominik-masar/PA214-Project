@@ -48,6 +48,8 @@ def get_profiles_layout(app, available_countries, view_type='astronauts'):
             ),
             ],
             style={
+            'width': '96%',
+            'paddingLeft': '2%',
             'display': 'flex',
             'alignItems': 'center',
             'justifyContent': 'space-between',
@@ -71,10 +73,12 @@ def register_profiles_callbacks(app, missions_df):
 
     def go_to_mission_log(clickData):
         if clickData and 'points' in clickData and clickData['points']:
-            detail = clickData['points'][0]['customdata']
-            try:
-                idx = missions_df[missions_df['Detail'] == detail].index[0]
-                return f"/mission/{idx}"
-            except Exception:
-                pass
+            point = clickData['points'][0]
+            detail = point.get('customdata')
+            if detail:
+                try:
+                    idx = missions_df[missions_df['Detail'] == detail].index[0]
+                    return f"/mission/{idx}"
+                except Exception:
+                    pass
         return dash.no_update
