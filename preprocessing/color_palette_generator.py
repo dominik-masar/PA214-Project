@@ -1,20 +1,20 @@
 import matplotlib.colors as mcolors
 import seaborn as sns
 
-def generate_country_colors(data, column='Country', fallback_palette='hls'):
+def generate_country_colors(data, column='Country', fallback_palette='Set2'):
     manual_colors = {
-        'USA': '#2d4ed2',
-        'India': '#ea9a15',
-        'Kazakhstan': '#15d7ea',
-        'France': '#dbe11e',
-        'Russia': '#ff0c00',
-        'Pacific Ocean': '#5da0ff',
-        'Japan': '#fea2ff',
-        'Others': '#888888'
+        'USA': '#4F8EF7',     
+        'Russia': '#F74F4F',    
+        'Kazakhstan': '#FFB84D',
+        'Ukraine': '#F7B32B',   
+        'China': '#FF8C8C',     
+        'Germany': '#23263A',  
+        'France': '#7EC4FF',  
+        'UK': '#FFD166',
+        'Others': "#C3C3C3",       
     }
 
     all_countries = data[column].unique().tolist()
-
     remaining_countries = [c for c in all_countries if c not in manual_colors]
 
     fallback_colors = sns.color_palette(fallback_palette, len(remaining_countries))

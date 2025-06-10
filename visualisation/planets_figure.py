@@ -1,15 +1,15 @@
 import pandas as pd
-from dash import html, Input, Output, State, ctx, dash,dcc
+from dash import html, Input, Output, State, ctx, dash, dcc
 
-# --- Načtení a příprava dat (stejně jako v timeline) ---
+# --- Load and prepare data ---
 df = pd.read_csv("datasets/final_dataset_missions.csv")
 
-# --- Planety a styly ---
+# --- Planets and styles ---
 textures = {
-    "Earth": "/assets/images/earth.PNG",
-    "Mars": "/assets/images/mars.PNG",
-    "Moon": "/assets/images/moon.PNG",
-    "Milky Way": "/assets/images/milkyway.png"
+    "Earth": "/assets/images/earth_orbit.png",
+    "Moon": "/assets/images/moon.png",
+    "Solar System": "/assets/images/solar_system.png",
+    "Outer Space": "/assets/images/outer_space.png"
 }
 
 planet_ids = {name: name.lower().replace(" ", "-") + "-id" for name in textures}
@@ -17,45 +17,44 @@ planet_ids = {name: name.lower().replace(" ", "-") + "-id" for name in textures}
 base_style = {
     "backgroundSize": "cover",
     "borderRadius": "50%",
-    "width": "70px",
-    "height": "70px",
-    "margin": "30px",
-    "transition": "transform 0.4s ease, box-shadow 0.4s ease"
-}
-
-pop_style = {
-    "transform": "scale(1.5)",
+    "width": "13vh",
+    "height": "13vh",
+    "margin": "0px",
+    "transition": "transform 0.4s ease, box-shadow 0.4s ease",
+    "position": "relative",
+    "display": "flex",
+    "justifyContent": "center",
+    "alignItems": "center",
+    "color": "white",
+    "fontWeight": "bold",
+    "fontSize": "20px",
+    "textShadow": "0 0 4px black"
 }
 
 def get_planet_layout():
     return html.Div([
-        # Store pro předchozí hodnoty
         dcc.Store(id="previous-planet-values", data={name: "0" for name in textures}),
         dcc.Interval(id="planet-init-trigger", interval=100, n_intervals=0, max_intervals=1),
-
         html.Div([
-            html.Div(id=planet_ids[name], style={
-                **base_style,
-                "margin": "5px",
-                "backgroundImage": f"url('{path}')",
-                "position": "relative",
-                "display": "flex",
-                "justifyContent": "center",
-                "alignItems": "center",
-                "color": "white",
-                "fontWeight": "bold",
-                "fontSize": "16px",
-                "textShadow": "0 0 4px black"
-            }, children="0")
+            html.Div(
+                id=planet_ids[name],
+                style={
+                    **base_style,
+                    "backgroundImage": f"url('{path}')"
+                },
+                children="0"
+            )
             for name, path in textures.items()
         ], style={
             "display": "flex",
+            "flexDirection": "column",
             "justifyContent": "center",
+            "height": "100%",
+            "width": "100%",
             "alignItems": "center",
-            "gap": "10px",
             "padding": "0",
         })
-    ], style={"margin": "0px", "padding": "0px"})
+    ], style={"margin": "0px", "height": "100%", "padding": "0px"})
 
 def register_planet_callbacks(app):
     @app.callback(
@@ -74,12 +73,11 @@ def register_planet_callbacks(app):
         mask = (df['Year'] >= start) & (df['Year'] <= end)
         filtered = df[mask]
 
-        # Počty misí podle zemí (příklad, můžeš upravit podle potřeby)
         planet_values = {
             "Earth": str(filtered[filtered['Mission Goal'] == 'Earth orbit'].shape[0]),
-            "Mars": str(filtered[filtered['Mission Goal'] == 'Solar system'].shape[0]),
             "Moon": str(filtered[filtered['Mission Goal'] == 'Moon'].shape[0]),
-            "Milky Way": str(filtered[filtered['Mission Goal'] == 'Outer space'].shape[0]),
+            "Solar System": str(filtered[filtered['Mission Goal'] == 'Solar system'].shape[0]),
+            "Outer Space": str(filtered[filtered['Mission Goal'] == 'Outer space'].shape[0]),
         }
 
         children_outputs = []
@@ -87,36 +85,12 @@ def register_planet_callbacks(app):
 
         for name in textures:
             new_val = planet_values.get(name, "0")
-            prev_val = previous_values.get(name, "0")
 
-            # Pokud se hodnota změnila, "popni" planetu
-            if new_val != prev_val:
-                style = {
-                    **base_style,
-                    "backgroundImage": f"url('{textures[name]}')",
-                    "position": "relative",
-                    "display": "flex",
-                    "justifyContent": "center",
-                    "alignItems": "center",
-                    "color": "white",
-                    "fontWeight": "bold",
-                    "fontSize": "18px",
-                    "textShadow": "0 0 4px black",
-                    **pop_style
-                }
-            else:
-                style = {
-                    **base_style,
-                    "backgroundImage": f"url('{textures[name]}')",
-                    "position": "relative",
-                    "display": "flex",
-                    "justifyContent": "center",
-                    "alignItems": "center",
-                    "color": "white",
-                    "fontWeight": "bold",
-                    "fontSize": "18px",
-                    "textShadow": "0 0 4px black",
-                }
+            style = {
+                **base_style,
+                "backgroundImage": f"url('{textures[name]}')"
+            }
+
 
             children_outputs.append(new_val)
             style_outputs.append(style)

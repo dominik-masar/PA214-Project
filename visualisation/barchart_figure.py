@@ -20,11 +20,22 @@ def barchart_fig(data, color_palette, top_n=9):
         y='Country',
         color='Country',
         color_discrete_map=color_palette,
-        labels={'Count': 'Number of Missions'},
-        text='Country'
+        labels={'Count': 'Mission Count'},
+        text='Country',
+        hover_data={'Country': True, 'Count': True},
     )
 
+    # Add rounded edges to bars
+    for trace in fig.data:
+        trace.marker.line.width = 0
+        trace.marker.line.color = 'rgba(0,0,0,0)'
+        trace.marker.opacity = 1
+        trace.marker.pattern = None
+        trace.marker.cornerradius = 8
+
+
     fig.update_layout(
+        height=None,
         yaxis=dict(
             categoryorder='total ascending',
             showticklabels=False,
@@ -33,9 +44,11 @@ def barchart_fig(data, color_palette, top_n=9):
             zeroline=False
         ),
         margin=dict(l=0, r=0, t=0, b=0),
-        height=700,
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
         showlegend=False
     )
+
+    # TODO mission count: either hover info or number in brackets
+
     return fig
