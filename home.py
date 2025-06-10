@@ -11,7 +11,7 @@ def get_home_layout(app):
     map_figure = map_fig(missions_df, app.max_missions)
 
     return html.Div([
-        get_navbar(),
+        get_navbar(True),
         html.Div([
             html.Div(get_planet_layout(), id='planets-col', style={
                 'width': '10%',

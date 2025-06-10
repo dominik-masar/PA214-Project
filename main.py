@@ -7,12 +7,11 @@ from profiles import get_profiles_layout
 from info import get_info_layout, get_mission_detail_layout
 from seaborn import color_palette
 import matplotlib.colors as mcolors
-from callbacks.sidebar_callbacks import register_sidebar_callbacks
+from callbacks.search_callbacks import register_search_callbacks
 from callbacks.map_callbacks import register_map_callbacks
-from visualisation.map_figure import map_fig
-from visualisation.active_years_figure import get_active_years_fig, register_active_years_callbacks
-from visualisation.timeline_figure import get_timeline_layout, register_timeline_callbacks
-from visualisation.planets_figure import get_planet_layout, register_planet_callbacks
+from visualisation.active_years_figure import register_active_years_callbacks
+from visualisation.timeline_figure import register_timeline_callbacks
+from visualisation.planets_figure import register_planet_callbacks
 from preprocessing.color_palette_generator import generate_country_colors
 from preprocessing.loadDatasets import load_datasets, get_country_list
 from utils.min_max_setter import set_max_count_to_app
@@ -34,6 +33,7 @@ app = dash.Dash(__name__, suppress_callback_exceptions=True)
 #app = dash.Dash(__name__)
 app.title = "Space Missions"
 app.missions_df = missions_df
+app.filtered_df = missions_df
 app.astronauts_df = astronauts_df
 app.astronauts_country_counts = astronauts_df.groupby('Profile.Nationality')['Profile.Name'].nunique()
 app.missions_country_counts = missions_df.groupby('Country')['Company Name'].nunique()
@@ -73,7 +73,7 @@ def display_page(pathname):
 
 
 register_timeline_callbacks(app)
-register_sidebar_callbacks(app)
+register_search_callbacks(app)
 register_map_callbacks(app)
 register_planet_callbacks(app)
 register_active_years_callbacks(app)

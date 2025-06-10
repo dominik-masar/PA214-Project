@@ -1,8 +1,9 @@
 from dash.dependencies import Output, Input, State
 from dash import html, dcc
 from visualisation.barchart_figure import barchart_fig
+from info import get_info_layout
 
-def register_sidebar_callbacks(app):
+def register_search_callbacks(app):
     @app.callback(
         Output('search-input', 'value'),
         Output('trigger-update', 'data', allow_duplicate = True),
@@ -24,6 +25,16 @@ def register_sidebar_callbacks(app):
             app.filtered_df = app.missions_df[app.missions_df['Detail'].str.contains(search_term, na=False, case=False)]
             return {"search_triggered": True}
         return {"search_triggered": False}
+    
+    @app.callback(
+        Output('mission-logs', 'value'),
+        Input('trigger-update', 'data'),
+        State('url', 'pathname'),
+        prevent_initial_call=True
+    )
+    def update_missions(trigger_data, pathname):
+        if trigger_data and trigger_data['search_triggered']:
+            return get_info_layout(app, pathname)
 
 
     @app.callback(

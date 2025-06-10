@@ -12,7 +12,7 @@ link_style = {
     'transition': 'background 0.2s'
 }
 
-def get_navbar():
+def get_navbar(show_search=False):
     search_input_style = {
         'padding': '8px 12px',
         'borderRadius': '8px 0 0 8px',
@@ -50,7 +50,7 @@ def get_navbar():
         dcc.Link("👩‍🚀 Astronauts", href="/astronauts", style=link_style),
         dcc.Link("🏢 Companies", href="/companies", style=link_style),
         dcc.Link("📖 Mission Logs", href="/logs", style=link_style),
-        html.Div([
+        *([html.Div([
             dcc.Input(id='search-input', type='text', placeholder='Search...', style=search_input_style),
             html.Button('Search', id='search-button', n_clicks=0, style=search_button_style),
             html.Button('Reset', id='reset-button', n_clicks=0, style=reset_button_style),
@@ -62,7 +62,7 @@ def get_navbar():
             'marginLeft': '10px',
             'marginRight': '10px',
             'marginLeft': 'auto'
-        }),
+        })] if show_search else []),
     ], style={
         'backgroundColor': PALETTE['background'],
         'padding': '14px',

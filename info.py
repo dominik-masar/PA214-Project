@@ -13,6 +13,9 @@ merged_df = merged_df.set_index(missions_df.index)
 
 
 def get_info_layout(app, pathname):
+    merged_df = pd.merge(app.filtered_df, wiki_df, on="Index", how="left")
+    merged_df = merged_df.set_index(app.filtered_df.index)
+
     # Extract page number
     try:
         page = int(pathname.split("/logs/")[-1]) if "/logs/" in pathname else 1
@@ -65,13 +68,13 @@ def get_info_layout(app, pathname):
     ], style={'textAlign': 'center', 'marginTop': '40px'})
 
     return html.Div([
-        get_navbar(),
+        get_navbar(True),
         html.Div([
             html.H1("🚀 Mission Logs", style={'textAlign': 'center', 'marginBottom': '30px'}),
             html.Div(mission_cards),
             nav
         ], style={'maxWidth': '1000px', 'margin': 'auto'})
-    ])
+    ], id='mission-logs')
 
 
 def get_mission_detail_layout(app, mission_id):

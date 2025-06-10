@@ -1,7 +1,5 @@
 import numpy as np
-from dash.dependencies import Output, Input, State
 import plotly.express as px
-from design.color_palettes import PALETTE
 
 def map_fig(csv_data, max_missions, precision=2, max_size=40):
     csv_data = csv_data.copy()
