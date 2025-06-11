@@ -1,5 +1,5 @@
 from dash.dependencies import Output, Input, State
-from dash import html, dcc
+from dash import html, dcc, exceptions
 from visualisation.barchart_figure import barchart_fig
 from info import get_info_layout
 
@@ -35,7 +35,15 @@ def register_search_callbacks(app):
         prevent_initial_call=False
     )
     def update_missions(trigger_data, pathname):
-        if trigger_data and trigger_data['search_triggered']:
+        valid_base_paths = ['/home', '/astronauts', '/companies', '/logs', '']
+    
+        is_base_tab_change = pathname in valid_base_paths
+        is_search = trigger_data and trigger_data.get('search_triggered')
+
+        if not is_base_tab_change and not is_search:
+            raise exceptions.PreventUpdate
+
+        if (trigger_data and trigger_data['search_triggered']):
             app.filtered_df = app.filtered_df.reset_index(drop=True)
         else:
             app.filtered_df = app.missions_df.reset_index(drop=True)
