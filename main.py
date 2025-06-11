@@ -52,8 +52,7 @@ app.layout = html.Div([
     dcc.Store(id="initial-start-position"),
     dcc.Store(id="animation-index"),
     dcc.Store(id="is-playing"),
-    dcc.Store(id="clicked-mission"),
-    dcc.Location(id='url', refresh=False)
+    dcc.Store(id="clicked-mission")
 ])
 
 @app.callback(Output('page-content', 'children'), Input('url', 'pathname'))
