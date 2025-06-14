@@ -7,7 +7,7 @@ df = pd.read_csv("datasets/final_dataset_missions.csv")
 # --- Planets and styles ---
 textures = {
     "Earth": "/assets/images/earth_orbit.png",
-    "Moon": "/assets/images/moon.png",
+    "Moon": "/assets/images/moon_image.png",
     "Solar System": "/assets/images/solar_system.png",
     "Outer Space": "/assets/images/outer_space.png"
 }
