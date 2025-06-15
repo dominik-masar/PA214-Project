@@ -2,7 +2,7 @@ import pandas as pd
 from dash import html, Input, Output, State, ctx, dash, dcc
 
 # --- Load and prepare data ---
-df = pd.read_csv("datasets/final_dataset_missions.csv")
+#df = pd.read_csv("datasets/final_dataset_missions.csv")
 
 # --- Planets and styles ---
 textures = {
@@ -61,15 +61,23 @@ def register_planet_callbacks(app):
         [Output(planet_ids[name], "children") for name in textures] +
         [Output(planet_ids[name], "style") for name in textures] +
         [Output("previous-planet-values", "data")],
-        Input("selected-years", "data"),
-        State("previous-planet-values", "data"),
+        [Input('selected-years', 'data'),
+         Input('trigger-update', 'data'),
+         Input('timeline-mode-toggle', 'value')],
+        
         prevent_initial_call=False
     )
-    def update_planets(year_range, previous_values):
-        if not year_range:
+    def update_planets(selected_range, trigger_data, mode_toggle):
+        if not selected_range:
             raise dash.exceptions.PreventUpdate
 
-        start, end = year_range
+        start, end = selected_range
+        
+        if trigger_data and trigger_data['search_triggered']:
+            df = app.filtered_df
+        else:
+            df = app.missions_df
+
         mask = (df['Year'] >= start) & (df['Year'] <= end)
         filtered = df[mask]
 
