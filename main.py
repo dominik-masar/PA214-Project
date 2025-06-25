@@ -1,21 +1,17 @@
-# main.py
-import dash
-from dash import dcc, html, Input, Output
-#from app import app
-from home import get_home_layout
-from profiles import get_profiles_layout
-from info import get_info_layout, get_mission_detail_layout
-from seaborn import color_palette
-import matplotlib.colors as mcolors
-from callbacks.search_callbacks import register_search_callbacks
 from callbacks.map_callbacks import register_map_callbacks
-from visualisation.active_years_figure import register_active_years_callbacks
-from visualisation.timeline_figure import register_timeline_callbacks
-from visualisation.planets_figure import register_planet_callbacks
+from callbacks.search_callbacks import register_search_callbacks
+from dash import Dash, dcc, html, Input, Output
+from elements.home import get_home_layout
+from elements.info import get_info_layout, get_mission_detail_layout
+from elements.profiles import get_profiles_layout, register_profiles_callbacks
+from matplotlib.colors import to_hex
 from preprocessing.color_palette_generator import generate_country_colors
 from preprocessing.loadDatasets import load_datasets, get_country_list
+from seaborn import color_palette
 from utils.min_max_setter import set_max_count_to_app
-from profiles import register_profiles_callbacks
+from visualisation.active_years_figure import register_active_years_callbacks
+from visualisation.planets_figure import register_planet_callbacks
+from visualisation.timeline_figure import register_timeline_callbacks
 
 DATASET_MISSIONS_PATH = "datasets/final_dataset_missions.csv"
 DATASET_ASTRONAUTS_PATH = "datasets/astronauts.csv"
@@ -24,12 +20,12 @@ DATASET_WIKI_PATH = "datasets/wiki_summaries.csv"
 # Load datasets
 missions_df, astronauts_df = load_datasets(mission_path=DATASET_MISSIONS_PATH, astronauts_path=DATASET_ASTRONAUTS_PATH)
 palette = color_palette("hls", 100)
-hex_colors = [mcolors.to_hex(c) for c in palette]
+hex_colors = [to_hex(c) for c in palette]
 color_map = generate_country_colors(missions_df, column='Country')
 missions_countries = get_country_list(missions_df, 'Country')
 astronauts_countries = get_country_list(astronauts_df, 'Profile.Nationality')
 
-app = dash.Dash(__name__, suppress_callback_exceptions=True)
+app = Dash(__name__, suppress_callback_exceptions=True)
 #app = dash.Dash(__name__)
 app.title = "Space Missions"
 app.missions_df = missions_df
