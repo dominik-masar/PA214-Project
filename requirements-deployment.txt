@@ -1,0 +1,9 @@
+dash==3.0.4
+dash_daq==0.6.0
+geopy==2.4.1
+matplotlib==3.10.3
+numpy==2.3.1
+pandas==2.3.0
+plotly==6.0.1
+seaborn==0.13.2
+gunicorn==23.0.0
