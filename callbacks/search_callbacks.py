@@ -1,7 +1,7 @@
 from dash.dependencies import Output, Input, State
 from dash import html, dcc, exceptions
 from visualisation.barchart_figure import barchart_fig
-from info import get_info_layout
+from elements.info import get_info_layout
 
 def register_search_callbacks(app):
     @app.callback(

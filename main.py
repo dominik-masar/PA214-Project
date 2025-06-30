@@ -1,3 +1,4 @@
+import os
 from callbacks.map_callbacks import register_map_callbacks
 from callbacks.search_callbacks import register_search_callbacks
 from dash import Dash, dcc, html, Input, Output
@@ -26,7 +27,8 @@ missions_countries = get_country_list(missions_df, 'Country')
 astronauts_countries = get_country_list(astronauts_df, 'Profile.Nationality')
 
 app = Dash(__name__, suppress_callback_exceptions=True)
-#app = dash.Dash(__name__)
+server = app.server
+
 app.title = "Space Missions"
 app.missions_df = missions_df
 app.filtered_df = missions_df
@@ -76,4 +78,4 @@ register_active_years_callbacks(app)
 register_profiles_callbacks(app, missions_df)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+   app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8050)))

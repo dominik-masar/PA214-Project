@@ -1,7 +1,6 @@
 import pandas as pd
 from dash import html, dcc
-from navbar import get_navbar
-import re
+from elements.navbar import get_navbar
 
 # TODO muzu tohle cist z app? ze by to taky bylo napojene na search potom...
 missions_df = pd.read_csv("datasets/final_dataset_missions.csv")

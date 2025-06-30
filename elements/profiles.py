@@ -1,11 +1,7 @@
 
-from dash import html, dcc, Input, Output, callback, State
-from visualisation.active_years_figure import get_active_years_fig
-
-from navbar import get_navbar
+from dash import html, dcc, Input, Output
+from elements.navbar import get_navbar
 import dash
-
-
 
 def get_profiles_layout(app, available_countries, view_type='astronauts'):
     # Count records for each country

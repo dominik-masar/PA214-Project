@@ -3,7 +3,7 @@ from dash import html, dcc
 from visualisation.map_figure import map_fig
 from visualisation.timeline_figure import get_timeline_layout
 from visualisation.planets_figure import get_planet_layout
-from navbar import get_navbar
+from elements.navbar import get_navbar
 
 
 def get_home_layout(app):
