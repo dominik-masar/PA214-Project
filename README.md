@@ -6,7 +6,7 @@
 
 ## 🌌 Overview
 
-🌐 **Live App**: [from-sputnik-to-spacex.onrender.com](https://from-sputnik-to-spacex.onrender.com)
+🌐 **Live App**: [from-sputnik-to-spacex.onrender.com](https://from-sputnik-to-spacex.onrender.com) (may take a while to load)
 
 *From Sputnik to SpaceX* is an interactive web-based visualization project that explores the history and evolution of space missions and astronaut data from **1957 to 2020**. By combining datasets from Kaggle with enriched contextual information from Wikipedia and geolocation services, the application delivers an insightful, interactive experience.
 
